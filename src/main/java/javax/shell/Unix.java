@@ -124,9 +124,47 @@ public class Unix {
 	}
 
 	/**
+	 * *NIX program <code>true</code> (i.e. always succeed).
+	 */
+	public static Program true_() {
+		return new Program() {
+			@Override
+			public void runme() {
+
+			}
+		};
+	}
+
+	/**
+	 * *NIX program <code>false</code> (i.e. fails always).
+	 */
+	public static Program false_() {
+		return new Program() {
+			@Override
+			public void runme() {
+				throw new IllegalStateException("false");
+			}
+		};
+	}
+
+	/**
 	 * *NIX program <code>find</code> (i.e. search for files).
 	 */
 	public static Program find(String options, String folder) {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>pwd</code> (i.e. print working directory).
+	 */
+	public static Program pwd() {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>cd</code> (i.e. change directory).
+	 */
+	public static Program cd(String folder) {
 		throw new IllegalStateException("Not implemented");
 	}
 }
