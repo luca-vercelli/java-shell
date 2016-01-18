@@ -3,6 +3,9 @@ package javax.shell.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,37 +15,52 @@ import org.junit.Test;
 
 public class TestProgram {
 
-	public void setup(){
-		
+	public void setup() {
+
 	}
-	
+
 	@Test
-	public void testExpansion() {
-		getClass().getResource("/javax/shell/test/resources/file1.txt");
-		File dir = new File("./javax/shell/test/resources");
-		assertTrue("Resources folder not fould", dir.exists());
+	public void testExpansion() throws URISyntaxException {
+		// FIXME this only works if not packaged
+		URL resource = getClass().getResource("/dir1/file1.txt");
+		assertTrue("Resources file not found?!?", resource != null);
+		File dir = new File(resource.toURI()).getParentFile().getParentFile();
+		assertTrue("Resources folder " + dir + " not found?!?", dir.exists());
 
-		List<String> args,exp;
+		System.setProperty("user.dir", dir.getAbsolutePath());
+		System.out.println("DEBUG resources=" + dir.getAbsolutePath());
 		
-		args = new ArrayList<String>();
-		args.add("./javax/shell/test/resources/file*");
-		exp = Program.expand(args);
-		assertTrue("There are 3 files", 3 == exp.size());
+		List<String> args, exp;
 
 		args = new ArrayList<String>();
-		args.add("javax/shell/test/resources/file*");
+		args.add("./dir1/file*");
 		exp = Program.expand(args);
-		assertTrue("There are 3 files", 3 == exp.size());
+		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
-		args.add("javax/shell/test/resources/file?.p*");
+		args.add("dir1/file*");
 		exp = Program.expand(args);
-		assertTrue("There is 1 file here", 1 == exp.size());
+		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
-		args.add("/javax/shell/test/resources/file?.p*");
+		args.add("dir1/file?.txt");
+		exp = Program.expand(args);
+		assertEquals("There are 2 files .txt here", 2, exp.size());
+
+		args = new ArrayList<String>();
+		args.add(dir.getAbsolutePath() + "/dir1/file?.txt");
+		exp = Program.expand(args);
+		assertEquals("There are 2 files .txt here", 2, exp.size());
+
+		args = new ArrayList<String>();
+		args.add("/file?.txt");
 		exp = Program.expand(args);
 		assertTrue("No file should be there", exp.isEmpty());
+
+		args = new ArrayList<String>();
+		args.add("*/file*.txt");
+		exp = Program.expand(args);
+		assertEquals("There are 2+1=3 files .txt", 3, exp.size());
 
 	}
 

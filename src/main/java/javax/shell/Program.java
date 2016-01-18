@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 public abstract class Program extends Thread {
 
 	public static OutputStream DEV_NULL = null;
+
 	static {
 		try {
 			DEV_NULL = new FileOutputStream(new File("/dev/null"));
@@ -51,8 +52,13 @@ public abstract class Program extends Thread {
 	}
 
 	protected InputStream stdin = System.in;
-	protected BufferedReader stdinReader = new BufferedReader(new InputStreamReader(
-			System.in));// this must ALWAYS point to stream stdin
+	protected BufferedReader stdinReader = new BufferedReader(new InputStreamReader(System.in));// this
+																								// must
+																								// ALWAYS
+																								// point
+																								// to
+																								// stream
+																								// stdin
 	protected PrintStream stdout = System.out;
 	protected List<String> args = null; // already shell-expanded
 	protected Program prec = null; // previous program in pipeline
@@ -98,8 +104,7 @@ public abstract class Program extends Thread {
 		try {
 			runme();
 		} catch (Exception e) {
-			System.err.println("Unhandled exception in Thread "
-					+ this.getName());
+			System.err.println("Unhandled exception in Thread " + this.getName());
 			e.printStackTrace(System.err);
 			System.exit(-1); // stop all threads...
 		}
@@ -230,8 +235,7 @@ public abstract class Program extends Thread {
 	/**
 	 * Create a list of FileInputStream, if any, or stdin.
 	 */
-	public List<InputStream> getInputStreams(List<String> files)
-			throws FileNotFoundException {
+	public List<InputStream> getInputStreams(List<String> files) throws FileNotFoundException {
 		List<InputStream> ret = new ArrayList<InputStream>();
 		if (files.isEmpty())
 			ret.add(stdin);
@@ -245,8 +249,7 @@ public abstract class Program extends Thread {
 	/**
 	 * Create a list of BufferedReader, if any, or stdin.
 	 */
-	public List<BufferedReader> getReaders(List<String> files)
-			throws FileNotFoundException {
+	public List<BufferedReader> getReaders(List<String> files) throws FileNotFoundException {
 		List<BufferedReader> ret = new ArrayList<BufferedReader>();
 		if (files.isEmpty())
 			ret.add(stdinReader);
@@ -260,8 +263,7 @@ public abstract class Program extends Thread {
 	/**
 	 * Create a list of FileOutputStream, if any, or stdout.
 	 */
-	public List<OutputStream> getOutputStreams(List<String> files,
-			boolean append) throws FileNotFoundException {
+	public List<OutputStream> getOutputStreams(List<String> files, boolean append) throws FileNotFoundException {
 		List<OutputStream> ret = new ArrayList<OutputStream>();
 		if (files.isEmpty())
 			ret.add(stdout);
@@ -272,11 +274,12 @@ public abstract class Program extends Thread {
 		return ret;
 	}
 
-	private static void expandRecursive(File root, Stack<String> pieces,
-			Set<String> ret) {
+	private static void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
 
 		if (!root.exists())
 			return;
+
+		System.out.println("DEBUG root=" + root.getAbsolutePath());
 
 		if (pieces.isEmpty() || !root.isDirectory()) {
 			ret.add(root.getPath());
@@ -284,8 +287,8 @@ public abstract class Program extends Thread {
 		}
 
 		String nextPiece = pieces.pop();
-		final Pattern p = Pattern.compile(pieces.pop().replaceAll("\\*", "\\*")
-				.replaceAll("\\?", "\\?"));
+		nextPiece = nextPiece.replaceAll("\\*", "\\*").replaceAll("\\?", "\\?");
+		final Pattern p = Pattern.compile(nextPiece);
 		String[] files = root.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String filename) {
@@ -327,8 +330,7 @@ public abstract class Program extends Thread {
 					path = ".\\" + path;
 				}
 			} else {
-				System.err
-						.println("Unsupported operating system! Please report this.");
+				System.err.println("Unsupported operating system! Please report this.");
 				return paths;
 			}
 
@@ -339,7 +341,7 @@ public abstract class Program extends Thread {
 			File root = new File(pieces[0].equals("") ? "/" : pieces[0]);
 
 			Stack<String> piecesStack = new Stack<String>();
-			for (int i = 1; i < pieces.length; ++i)
+			for (int i = pieces.length - 1; i > 0; --i)
 				piecesStack.push(pieces[i]);
 
 			expandRecursive(root, piecesStack, ret);
