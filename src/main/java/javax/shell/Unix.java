@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * It is useful to have all *NIX commands inside this class (it's easier to
@@ -19,7 +21,60 @@ import java.util.List;
 public class Unix {
 
 	/**
-	 * *NIX program <code>echo</code> (i.e. print to stdout).
+	 * *NIX shell command <code>pwd</code> (i.e. print working directory).
+	 */
+	public static Process pwd() {
+		return new Process() {
+			@Override
+			public void runme() throws Exception {
+				stdout.println(Process.getCurrentFolder());
+			}
+		};
+	}
+
+	/**
+	 * *NIX shell command <code>cd</code> (i.e. change directory).
+	 */
+	public static Process cd(final String folder) {
+		return new Process() {
+			@Override
+			public void runme() throws Exception {
+				Process.setCurrentFolder(folder);
+			}
+		};
+	}
+
+	private static Stack<String> historyFolders = new Stack<String>();
+
+	/**
+	 * *NIX shell command <code>pushd</code> (i.e. change directory saving
+	 * current one).
+	 */
+	public static Process pushd(final String folder) {
+		return new Process() {
+			@Override
+			public void runme() throws Exception {
+				historyFolders.push(Process.getCurrentFolder());
+				Process.setCurrentFolder(folder);
+			}
+		};
+	}
+
+	/**
+	 * *NIX shell command <code>pushd</code> (i.e. change directory saving
+	 * current one).
+	 */
+	public static Process popd() {
+		return new Process() {
+			@Override
+			public void runme() throws EmptyStackException {
+				Process.setCurrentFolder(historyFolders.pop());
+			}
+		};
+	}
+
+	/**
+	 * *NIX shell command <code>echo</code> (i.e. print to stdout).
 	 */
 	public static Process echo(String... args) {
 		return new Process(args) {
@@ -154,17 +209,4 @@ public class Unix {
 		throw new IllegalStateException("Not implemented");
 	}
 
-	/**
-	 * *NIX program <code>pwd</code> (i.e. print working directory).
-	 */
-	public static Process pwd() {
-		throw new IllegalStateException("Not implemented");
-	}
-
-	/**
-	 * *NIX program <code>cd</code> (i.e. change directory).
-	 */
-	public static Process cd(String folder) {
-		throw new IllegalStateException("Not implemented");
-	}
 }

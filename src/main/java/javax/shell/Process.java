@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -327,13 +328,13 @@ public abstract class Process extends Thread {
 		String nextPiece = pieces.pop();
 		nextPiece = nextPiece.replaceAll("\\*", "\\*").replaceAll("\\?", "\\?");
 		final Pattern p = Pattern.compile(nextPiece);
-		String[] files = root.list();/*
-										 * new FilenameFilter() {
-										 * 
-										 * @Override public boolean accept(File
-										 * dir, String filename) { return
-										 * p.matcher(filename).matches(); } });
-										 */
+		String[] files = root.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String filename) {
+				return p.matcher(filename).matches();
+			}
+		});
+
 		for (String f : files) {
 			expandRecursive(new File(root, f), pieces, ret);
 		}
