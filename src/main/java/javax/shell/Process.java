@@ -138,14 +138,11 @@ public abstract class Process extends Thread {
 	 */
 	@Override
 	public void run() {
-		if (prec != null)
-			prec.start();
 		try {
 			runme();
 		} catch (Exception e) {
 			System.err.println("Unhandled exception in Thread " + this.getName());
 			e.printStackTrace(System.err);
-			System.exit(-1); // stop all threads...
 		}
 	}
 
@@ -162,6 +159,7 @@ public abstract class Process extends Thread {
 	 * p1.pipe(p2).pipe(p3).start()
 	 * 
 	 * @return the second Program p2
+	 * @throws IOException
 	 */
 	public Process pipe(Process p2) throws IOException {
 		PipedInputStream pis = new PipedInputStream();
@@ -180,7 +178,7 @@ public abstract class Process extends Thread {
 	 * 
 	 * @return the second Program p2
 	 */
-	public Process and(final Process p2) throws IOException {
+	public Process and(final Process p2) {
 
 		final Process p1 = this;
 
@@ -208,7 +206,7 @@ public abstract class Process extends Thread {
 	 * 
 	 * @return the second Program p
 	 */
-	public Process or(final Process p2) throws IOException {
+	public Process or(final Process p2) {
 
 		final Process p1 = this;
 

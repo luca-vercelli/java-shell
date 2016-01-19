@@ -3,6 +3,7 @@ package javax.shell.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,18 +65,183 @@ public class TestProcess {
 	}
 
 	@Test
-	public void testPipelines() {
-		fail("Not yet implemented");
+	public void testPipelines() throws IOException {
+		final List<Integer> processes = new ArrayList<Integer>();
+		final List<String> lines = new ArrayList<String>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(1);
+				stdout.println("ehlo");
+				stdout.println("mydarling");
+				stdout.println("seeyou");
+			}
+		};
+
+		Process p2 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(2);
+				while (stdinReader.ready()) {
+					String l = stdinReader.readLine();
+					lines.add(l);
+				}
+			}
+		};
+
+		p1.pipe(p2).start();
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+
+		assertEquals("Two processes ran", 2, processes.size());
+		assertEquals("3 lines should be elaborated", 3, lines.size());
 	}
 
 	@Test
 	public void testAnd() {
-		fail("Not yet implemented");
+		final List<Integer> processes = new ArrayList<Integer>();
+		final List<String> lines = new ArrayList<String>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(1);
+				stdout.println("ehlo");
+				stdout.println("mydarling");
+				stdout.println("seeyou");
+			}
+		};
+
+		Process p2 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(2);
+				while (stdinReader.ready()) {
+					String l = stdinReader.readLine();
+					lines.add(l);
+				}
+			}
+		};
+
+		p1.and(p2).start();
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+
+		assertEquals("Two processes ran", 2, processes.size());
+		assertEquals("0 lines should be elaborated", 0, lines.size());
+	}
+
+	@Test
+	public void testAnd2() {
+		final List<Integer> processes = new ArrayList<Integer>();
+		final List<String> lines = new ArrayList<String>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(1);
+				throw new IllegalStateException();
+			}
+		};
+
+		Process p2 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(2);
+				while (stdinReader.ready()) {
+					String l = stdinReader.readLine();
+					lines.add(l);
+				}
+			}
+		};
+
+		p1.and(p2).start();
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+
+		assertEquals("1 processes ran", 1, processes.size());
+		assertEquals("0 lines should be elaborated", 0, lines.size());
 	}
 
 	@Test
 	public void testOr() {
-		fail("Not yet implemented");
+		final List<Integer> processes = new ArrayList<Integer>();
+		final List<String> lines = new ArrayList<String>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(1);
+				stdout.println("ehlo");
+				stdout.println("mydarling");
+				stdout.println("seeyou");
+			}
+		};
+
+		Process p2 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(2);
+				while (stdinReader.ready()) {
+					String l = stdinReader.readLine();
+					lines.add(l);
+				}
+			}
+		};
+
+		p1.or(p2).start();
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+
+		assertEquals("1 process ran", 1, processes.size());
+		assertEquals("0 lines should be elaborated", 0, lines.size());
 	}
 
+	@Test
+	public void testOr2() {
+		final List<Integer> processes = new ArrayList<Integer>();
+		final List<String> lines = new ArrayList<String>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(1);
+				throw new IllegalStateException();
+			}
+		};
+
+		Process p2 = new Process() {
+			@Override
+			public void runme() throws Exception {
+				processes.add(2);
+				while (stdinReader.ready()) {
+					String l = stdinReader.readLine();
+					lines.add(l);
+				}
+			}
+		};
+
+		p1.or(p2).start();
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+
+		assertEquals("2 processes ran", 2, processes.size());
+		assertEquals("0 lines should be elaborated", 0, lines.size());
+	}
 }
