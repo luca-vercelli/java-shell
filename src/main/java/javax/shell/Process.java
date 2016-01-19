@@ -389,8 +389,6 @@ public abstract class Process extends Thread {
 		if (!root.exists())
 			return;
 
-		System.out.println("DEBUG root=" + root.getAbsolutePath());
-
 		if (pieces.isEmpty() || !root.isDirectory()) {
 			ret.add(root.getPath());
 			return;
@@ -441,8 +439,6 @@ public abstract class Process extends Thread {
 			// here, we *must* perform expansion
 
 			String[] pieces = splitRoot(path);
-
-			System.out.println("DEBUG: " + Arrays.asList(pieces));
 
 			File root = new File(pieces[0]);
 

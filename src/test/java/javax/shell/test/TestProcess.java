@@ -28,7 +28,6 @@ public class TestProcess {
 		assertTrue("Resources folder " + dir + " not found?!?", dir.exists());
 
 		Process.setCurrentFolder(dir.getAbsolutePath());
-		System.out.println("DEBUG resources=" + dir.getAbsolutePath());
 
 		List<String> args, exp;
 
