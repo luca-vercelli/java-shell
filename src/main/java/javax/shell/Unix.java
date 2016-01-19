@@ -39,7 +39,7 @@ public class Unix {
 		return new Process() {
 			@Override
 			public void runme() throws Exception {
-				Process.setCurrentFolder(folder);
+				Process.setCurrentFolder(getAbsolutePath(folder));
 			}
 		};
 	}
@@ -55,7 +55,7 @@ public class Unix {
 			@Override
 			public void runme() throws Exception {
 				historyFolders.push(Process.getCurrentFolder());
-				Process.setCurrentFolder(folder);
+				Process.setCurrentFolder(getAbsolutePath(folder));
 			}
 		};
 	}
