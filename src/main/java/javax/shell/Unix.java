@@ -21,8 +21,8 @@ public class Unix {
 	/**
 	 * *NIX program <code>echo</code> (i.e. print to stdout).
 	 */
-	public static Program echo(String... args) {
-		return new Program(args) {
+	public static Process echo(String... args) {
+		return new Process(args) {
 			@Override
 			public void runme() throws Exception {
 				for (String s : args)
@@ -45,8 +45,8 @@ public class Unix {
 	/**
 	 * *NIX program <code>ls</code> (i.e. list directory).
 	 */
-	public static Program ls(String... args) {
-		return new Program(args) {
+	public static Process ls(String... args) {
+		return new Process(args) {
 			@Override
 			public void runme() throws FileNotFoundException {
 				if (args.isEmpty())
@@ -64,29 +64,29 @@ public class Unix {
 	/**
 	 * *NIX program <code>cp</code> (i.e. copy files).
 	 */
-	public static Program cp(String options, String... srcAndDest) {
+	public static Process cp(String options, String... srcAndDest) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
 	 * *NIX program <code>rm</code> (i.e. remove files).
 	 */
-	public static Program rm(String options, String... src) {
+	public static Process rm(String options, String... src) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
 	 * *NIX program <code>mv</code> (i.e. move files).
 	 */
-	public static Program mv(String options, String... srcAndDest) {
+	public static Process mv(String options, String... srcAndDest) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
 	 * *NIX program <code>cat</code> (i.e. print content of files).
 	 */
-	public static Program cat(String options, String... src) {
-		return new Program(src) {
+	public static Process cat(String options, String... src) {
+		return new Process(src) {
 			@Override
 			public void runme() throws IOException {
 
@@ -106,8 +106,8 @@ public class Unix {
 	 * *NIX program <code>grep</code> (i.e. search for text lines matching some
 	 * pattern).
 	 */
-	public static Program grep(String options, final String text, String... src) {
-		return new Program(src) {
+	public static Process grep(String options, final String text, String... src) {
+		return new Process(src) {
 			@Override
 			public void runme() throws IOException {
 
@@ -126,8 +126,8 @@ public class Unix {
 	/**
 	 * *NIX program <code>true</code> (i.e. always succeed).
 	 */
-	public static Program true_() {
-		return new Program() {
+	public static Process true_() {
+		return new Process() {
 			@Override
 			public void runme() {
 
@@ -138,8 +138,8 @@ public class Unix {
 	/**
 	 * *NIX program <code>false</code> (i.e. fails always).
 	 */
-	public static Program false_() {
-		return new Program() {
+	public static Process false_() {
+		return new Process() {
 			@Override
 			public void runme() {
 				throw new IllegalStateException("false");
@@ -150,21 +150,21 @@ public class Unix {
 	/**
 	 * *NIX program <code>find</code> (i.e. search for files).
 	 */
-	public static Program find(String options, String folder) {
+	public static Process find(String options, String folder) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
 	 * *NIX program <code>pwd</code> (i.e. print working directory).
 	 */
-	public static Program pwd() {
+	public static Process pwd() {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
 	 * *NIX program <code>cd</code> (i.e. change directory).
 	 */
-	public static Program cd(String folder) {
+	public static Process cd(String folder) {
 		throw new IllegalStateException("Not implemented");
 	}
 }

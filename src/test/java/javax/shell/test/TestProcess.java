@@ -9,11 +9,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.shell.Program;
+import javax.shell.Process;
 
 import org.junit.Test;
 
-public class TestProgram {
+public class TestProcess {
 
 	public void setup() {
 
@@ -34,32 +34,32 @@ public class TestProgram {
 
 		args = new ArrayList<String>();
 		args.add("./dir1/file*");
-		exp = Program.expand(args);
+		exp = Process.expand(args);
 		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("dir1/file*");
-		exp = Program.expand(args);
+		exp = Process.expand(args);
 		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("dir1/file?.txt");
-		exp = Program.expand(args);
+		exp = Process.expand(args);
 		assertEquals("There are 2 files .txt here", 2, exp.size());
 
 		args = new ArrayList<String>();
 		args.add(dir.getAbsolutePath() + "/dir1/file?.txt");
-		exp = Program.expand(args);
+		exp = Process.expand(args);
 		assertEquals("There are 2 files .txt here", 2, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("/file?.txt");
-		exp = Program.expand(args);
+		exp = Process.expand(args);
 		assertTrue("No file should be there", exp.isEmpty());
 
 		args = new ArrayList<String>();
 		args.add("*/file*.txt");
-		exp = Program.expand(args);
+		exp = Process.expand(args);
 		assertEquals("There are 2+1=3 files .txt", 3, exp.size());
 
 	}

@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * @author luca vercelli 2016
  * 
  */
-public abstract class Program extends Thread {
+public abstract class Process extends Thread {
 
 	public static OutputStream DEV_NULL = null;
 
@@ -61,21 +61,21 @@ public abstract class Program extends Thread {
 
 	protected List<String> args = null; // already shell-expanded
 
-	protected Program prec = null; // previous program in pipeline
+	protected Process prec = null; // previous program in pipeline
 
 	protected static String currentFolder = System.getProperty("user.dir");
 
 	// absolute path.
 
-	public Program(List<String> args) {
+	public Process(List<String> args) {
 		this.args = expand(args);
 	}
 
-	public Program(String[] args) {
+	public Process(String[] args) {
 		this.args = expand(Arrays.asList(args));
 	}
 
-	public Program() {
+	public Process() {
 		this.args = new ArrayList<String>();
 	}
 
@@ -129,7 +129,7 @@ public abstract class Program extends Thread {
 	 * 
 	 * @return the second Program p2
 	 */
-	public Program pipe(Program p2) throws IOException {
+	public Process pipe(Process p2) throws IOException {
 		PipedInputStream pis = new PipedInputStream();
 		p2.setStdin(pis);
 		this.setStdout(new PipedOutputStream(pis));
@@ -146,11 +146,11 @@ public abstract class Program extends Thread {
 	 * 
 	 * @return the second Program p2
 	 */
-	public Program and(final Program p2) throws IOException {
+	public Process and(final Process p2) throws IOException {
 
-		final Program p1 = this;
+		final Process p1 = this;
 
-		Program newP = new Program() {
+		Process newP = new Process() {
 
 			@Override
 			public void runme() throws Exception {
@@ -174,11 +174,11 @@ public abstract class Program extends Thread {
 	 * 
 	 * @return the second Program p
 	 */
-	public Program or(final Program p2) throws IOException {
+	public Process or(final Process p2) throws IOException {
 
-		final Program p1 = this;
+		final Process p1 = this;
 
-		Program newP = new Program() {
+		Process newP = new Process() {
 
 			@Override
 			public void runme() throws Exception {
@@ -202,7 +202,7 @@ public abstract class Program extends Thread {
 	 * 
 	 * @return this Program
 	 */
-	public Program redirect(String file) throws IOException {
+	public Process redirect(String file) throws IOException {
 		setStdout(new FileOutputStream(new File(file)));
 		return this;
 	}
@@ -213,7 +213,7 @@ public abstract class Program extends Thread {
 	 * 
 	 * @return this Program
 	 */
-	public Program append(String file) throws IOException {
+	public Process append(String file) throws IOException {
 		setStdout(new FileOutputStream(new File(file), true));
 		return this;
 	}
@@ -224,7 +224,7 @@ public abstract class Program extends Thread {
 	 * 
 	 * @return this Program
 	 */
-	public Program redirectFrom(String file) throws IOException {
+	public Process redirectFrom(String file) throws IOException {
 		setStdin(new FileInputStream(file));
 		return this;
 	}

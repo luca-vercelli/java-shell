@@ -7,7 +7,7 @@ public class DOS {
 	/**
 	 * DOS program <code>dir</code> (i.e. list directory).
 	 */
-	public static Program dir(String... args) {
+	public static Process dir(String... args) {
 		return Unix.ls(args);
 	}
 
