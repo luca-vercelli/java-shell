@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,11 +38,14 @@ import java.util.regex.Pattern;
  */
 public abstract class Process extends Thread {
 
-	public static OutputStream DEV_NULL = null;
+	/**
+	 * This should be a possible value for stdout, doing nothing.
+	 */
+	public static PrintStream DEV_NULL = null;
 
 	static {
 		try {
-			DEV_NULL = new FileOutputStream(new File("/dev/null"));
+			DEV_NULL = new PrintStream(new File("/dev/null"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -51,19 +53,43 @@ public abstract class Process extends Thread {
 		// FIXME unix only
 	}
 
+	/**
+	 * Standard input
+	 */
 	protected InputStream stdin = System.in;
 
-	protected BufferedReader stdinReader = new BufferedReader(
-			new InputStreamReader(System.in));
-	// this must ALWAYS point to stream stdin
+	/**
+	 * Standard input, supporting readLine(). This must <b>always</b> point to
+	 * stream stdin.
+	 */
+	protected BufferedReader stdinReader = new BufferedReader(new InputStreamReader(System.in));
 
+	/**
+	 * Standard output
+	 */
 	protected PrintStream stdout = System.out;
 
-	protected List<String> args = null; // already shell-expanded
+	/**
+	 * All arguments passed to the program, already shell-expanded.
+	 */
+	protected List<String> args = null;
 
-	protected Process prec = null; // previous program in pipeline
+	/**
+	 * Previous {@see Process} in pipeline.
+	 */
+	protected Process prec = null;
 
-	protected static String currentFolder = System.getProperty("user.dir");
+	/**
+	 * Recall that in Java there is not good "current folder", so we store it
+	 * here.
+	 * 
+	 * This attribute is static, that means that we can have only one shell at
+	 * the time. Please notice that, in a "philosophical" perspective, this is
+	 * not an attribute of the Process, it is an attribute of the shell itself,
+	 * meaning that different concurrent shell may have different current
+	 * folders.
+	 */
+	private static String currentFolder = System.getProperty("user.dir");
 
 	// absolute path.
 
@@ -88,6 +114,14 @@ public abstract class Process extends Thread {
 		stdout = new PrintStream(os);
 	}
 
+	public static String getCurrentFolder() {
+		return currentFolder;
+	}
+
+	public static void setCurrentFolder(String currentFolder) {
+		Process.currentFolder = currentFolder;
+	}
+
 	/**
 	 * Starting a Program will start all the pipeline before it.
 	 */
@@ -108,8 +142,7 @@ public abstract class Process extends Thread {
 		try {
 			runme();
 		} catch (Exception e) {
-			System.err.println("Unhandled exception in Thread "
-					+ this.getName());
+			System.err.println("Unhandled exception in Thread " + this.getName());
 			e.printStackTrace(System.err);
 			System.exit(-1); // stop all threads...
 		}
@@ -240,8 +273,7 @@ public abstract class Process extends Thread {
 	/**
 	 * Create a list of FileInputStream, if any, or stdin.
 	 */
-	public List<InputStream> getInputStreams(List<String> files)
-			throws FileNotFoundException {
+	public List<InputStream> getInputStreams(List<String> files) throws FileNotFoundException {
 		List<InputStream> ret = new ArrayList<InputStream>();
 		if (files.isEmpty())
 			ret.add(stdin);
@@ -255,8 +287,7 @@ public abstract class Process extends Thread {
 	/**
 	 * Create a list of BufferedReader, if any, or stdin.
 	 */
-	public List<BufferedReader> getReaders(List<String> files)
-			throws FileNotFoundException {
+	public List<BufferedReader> getReaders(List<String> files) throws FileNotFoundException {
 		List<BufferedReader> ret = new ArrayList<BufferedReader>();
 		if (files.isEmpty())
 			ret.add(stdinReader);
@@ -270,20 +301,18 @@ public abstract class Process extends Thread {
 	/**
 	 * Create a list of FileOutputStream, if any, or stdout.
 	 */
-	public List<OutputStream> getOutputStreams(List<String> files,
-			boolean append) throws FileNotFoundException {
-		List<OutputStream> ret = new ArrayList<OutputStream>();
+	public List<PrintStream> getOutputStreams(List<String> files, boolean append) throws FileNotFoundException {
+		List<PrintStream> ret = new ArrayList<PrintStream>();
 		if (files.isEmpty())
 			ret.add(stdout);
 		else
 			for (String file : files) {
-				ret.add(new FileOutputStream(file, append));
+				ret.add(new PrintStream(new FileOutputStream(file, append)));
 			}
 		return ret;
 	}
 
-	private static void expandRecursive(File root, Stack<String> pieces,
-			Set<String> ret) {
+	private static void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
 
 		if (!root.exists())
 			return;
@@ -299,12 +328,12 @@ public abstract class Process extends Thread {
 		nextPiece = nextPiece.replaceAll("\\*", "\\*").replaceAll("\\?", "\\?");
 		final Pattern p = Pattern.compile(nextPiece);
 		String[] files = root.list();/*
-									 * new FilenameFilter() {
-									 * 
-									 * @Override public boolean accept(File dir,
-									 * String filename) { return
-									 * p.matcher(filename).matches(); } });
-									 */
+										 * new FilenameFilter() {
+										 * 
+										 * @Override public boolean accept(File
+										 * dir, String filename) { return
+										 * p.matcher(filename).matches(); } });
+										 */
 		for (String f : files) {
 			expandRecursive(new File(root, f), pieces, ret);
 		}
@@ -340,8 +369,7 @@ public abstract class Process extends Thread {
 					path = ".\\" + path;
 				}
 			} else {
-				System.err
-						.println("Unsupported operating system! Please report this.");
+				System.err.println("Unsupported operating system! Please report this.");
 				return paths;
 			}
 
