@@ -161,7 +161,7 @@ public class Unix {
 	 * *NIX program <code>grep</code> (i.e. search for text lines matching some
 	 * pattern).
 	 */
-	public static Process grep(String options, final String text, String... src) {
+	public static Process grep(final String text, String... src) {
 		return new Process(src) {
 			@Override
 			public void runme() throws IOException {

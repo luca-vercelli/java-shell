@@ -3,7 +3,6 @@ package javax.shell.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,15 +20,16 @@ public class TestProcess {
 
 	@Test
 	public void testExpansion() throws URISyntaxException {
+
 		// FIXME this only works if not packaged
 		URL resource = getClass().getResource("/dir1/file1.txt");
 		assertTrue("Resources file not found?!?", resource != null);
 		File dir = new File(resource.toURI()).getParentFile().getParentFile();
 		assertTrue("Resources folder " + dir + " not found?!?", dir.exists());
 
-		System.setProperty("user.dir", dir.getAbsolutePath());
+		Process.setCurrentFolder(dir.getAbsolutePath());
 		System.out.println("DEBUG resources=" + dir.getAbsolutePath());
-		
+
 		List<String> args, exp;
 
 		args = new ArrayList<String>();

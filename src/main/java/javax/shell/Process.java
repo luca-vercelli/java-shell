@@ -313,6 +313,77 @@ public abstract class Process extends Thread {
 		return ret;
 	}
 
+	/**
+	 * Return true if path is absolute (i.e. /some/p*ath/ or C:\so?me\path ).
+	 */
+	protected static boolean isAbsolute(String path) {
+
+		if (path == null)
+			throw new IllegalArgumentException("null path given");
+		path = path.trim();
+		if (path.equals(""))
+			throw new IllegalArgumentException("empty path given");
+
+		if (File.separator.equals("/")) {
+			// *NIX
+			return path.length() >= 1 && path.charAt(0) == '/';
+
+		} else if (File.separator.equals("\\")) {
+			// Windows
+			return path.length() >= 2 && path.charAt(1) == ':';
+
+		} else {
+			throw new IllegalStateException("Unsupported operating system! Please report this.");
+		}
+	}
+
+	/**
+	 * Split the path in pieces according to File.separator. The first piece is
+	 * the "root": it is the path's root ( "/" or "C:\" ) if the given path is
+	 * absolute, or current folder if it is relative.
+	 */
+	protected static String[] splitRoot(String path) {
+
+		String[] pieces = path.split(File.separator);
+
+		if (!isAbsolute(path)) {
+
+			String[] result = new String[pieces.length + 1];
+			result[0] = currentFolder;
+			for (int i = 0; i < pieces.length; ++i)
+				result[i + 1] = pieces[i];
+			return result;
+
+		} else {
+			if (File.separator.equals("/")) {
+				// *NIX
+				pieces[0] = "/"; // instead of ""
+				return pieces;
+
+			} else if (File.separator.equals("\\")) {
+				// Windows
+				return pieces;
+
+			} else {
+				throw new IllegalStateException("Unsupported operating system! Please report this.");
+			}
+		}
+	}
+
+	/**
+	 * Return the absolute path corresponding to the given path. We cannot trust
+	 * of File.getAbsolutePath(). Wildchards supported.
+	 */
+	protected static String getAbsolutePath(String path) {
+
+		if (isAbsolute(path))
+			return path;
+
+		// here, the path is relative, and it is not null nor empty.
+
+		return Process.getCurrentFolder() + File.separator + path.trim();
+	}
+
 	private static void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
 
 		if (!root.exists())
@@ -326,18 +397,27 @@ public abstract class Process extends Thread {
 		}
 
 		String nextPiece = pieces.pop();
-		nextPiece = nextPiece.replaceAll("\\*", "\\*").replaceAll("\\?", "\\?");
-		final Pattern p = Pattern.compile(nextPiece);
-		String[] files = root.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String filename) {
-				return p.matcher(filename).matches();
+		if (!nextPiece.contains("*") && !nextPiece.contains("?")) {
+			// We use a different algorithm in order to see hidden files too
+			File son = new File(root, nextPiece);
+			if (son.exists()) {
+				expandRecursive(son, pieces, ret);
 			}
-		});
+		} else {
 
-		for (String f : files) {
-			expandRecursive(new File(root, f), pieces, ret);
+			final Pattern p = Pattern.compile(nextPiece.replace("*", ".*").replace("?", ".{1}"));
+			String[] files = root.list(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String filename) {
+					return p.matcher(filename).matches();
+				}
+			});
+
+			for (String f : files) {
+				expandRecursive(new File(root, f), pieces, ret);
+			}
 		}
+
 		pieces.push(nextPiece);
 	}
 
@@ -359,26 +439,12 @@ public abstract class Process extends Thread {
 								// options
 
 			// here, we *must* perform expansion
-			if (File.separator.equals("/")) {
-				// *NIX
-				if (!path.startsWith("/") && !path.startsWith("./")) {
-					path = "./" + path;
-				}
-			} else if (File.separator.equals("\\")) {
-				// Windows
-				if (path.charAt(0) != ':' && !path.startsWith(".\\")) {
-					path = ".\\" + path;
-				}
-			} else {
-				System.err.println("Unsupported operating system! Please report this.");
-				return paths;
-			}
 
-			String[] pieces = path.split(File.separator);
+			String[] pieces = splitRoot(path);
 
 			System.out.println("DEBUG: " + Arrays.asList(pieces));
 
-			File root = new File(pieces[0].equals("") ? "/" : pieces[0]);
+			File root = new File(pieces[0]);
 
 			Stack<String> piecesStack = new Stack<String>();
 			for (int i = pieces.length - 1; i > 0; --i)
