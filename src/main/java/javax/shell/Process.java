@@ -34,8 +34,11 @@ import java.util.regex.Pattern;
  * 
  * If you want run a single Process, without pipelining, you can just call
  * <code>.run()</code> instead of <code>.start()</code>. If you have built a
- * pipeline, and you want wait for it to terminate before continuing, then...
- * FIXME
+ * pipeline, and you want wait for it to terminate before continuing, then you
+ * can call <code>.sh()</code> instead of <code>.start()</code>. Thinking about
+ * shells, <code>.sh()</code> is the "usual" operation that the shell performs
+ * at end of line; <code>.start()</code> is the operation performed if an "&" is
+ * written at the end of the command.
  * 
  * TODO: we don't have a good options handling system yet.
  * 
@@ -129,13 +132,26 @@ public abstract class Process extends Thread {
 	}
 
 	/**
-	 * Starting a Program will start all the pipeline before it.
+	 * Starting a {@Process} will start all the pipeline before it.
 	 */
 	@Override
 	public void start() {
 		if (prec != null)
 			prec.start();
 		super.start();
+	}
+
+	/**
+	 * Start the {@Process}, then wait for it to finish.
+	 */
+	public void sh() {
+		start();
+		try {
+			join();
+		} catch (InterruptedException e) {
+			// why here?
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

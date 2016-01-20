@@ -39,9 +39,8 @@ public class TestUnix {
 		List<String> linesReceived = new ArrayList<String>();
 		Process tp = new TesterProcess(1, processesRan, linesReceived);
 
-		ls("dir1").pipe(tp).start();
+		ls("dir1").pipe(tp).sh();
 
-		Thread.sleep(1000);
 		assertEquals("There are 3 files inside folder 'dir1'", 3, linesReceived.size());
 	}
 
