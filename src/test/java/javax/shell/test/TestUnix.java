@@ -26,7 +26,7 @@ public class TestUnix {
 	}
 
 	@Test
-	public void testLs() throws URISyntaxException {
+	public void testLs() throws URISyntaxException, InterruptedException {
 		// FIXME this only works if not packaged
 		URL resource = getClass().getResource("/dir1/file1.txt");
 		assertTrue("Resources file not found?!?", resource != null);
@@ -37,7 +37,12 @@ public class TestUnix {
 
 		List<Integer> processesRan = new ArrayList<Integer>();
 		List<String> linesReceived = new ArrayList<String>();
-		Process p = new TesterProcess(1, processesRan, linesReceived);
+		Process tp = new TesterProcess(1, processesRan, linesReceived);
+
+		ls("dir1").pipe(tp).start();
+
+		Thread.sleep(1000);
+		assertEquals("There are 3 files inside folder 'dir1'", 3, linesReceived.size());
 	}
 
 }

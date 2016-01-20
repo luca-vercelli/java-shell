@@ -113,7 +113,7 @@ public class Unix {
 					expArgs.add(".");
 
 				for (String arg : expArgs) {
-					File[] files = ls1(arg);
+					File[] files = ls1(getAbsolutePath(arg));
 					for (File f : files)
 						stdout.println(f.getName());
 				}
@@ -478,6 +478,21 @@ public class Unix {
 	 * *NIX program <code>find</code> (i.e. search for files).
 	 */
 	public static Process find(String options, String folder) {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>wget</code> (i.e. download files from internet).
+	 * Output to stdout.
+	 */
+	public static Process wget(String address) {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>wget</code> (i.e. download files from internet).
+	 */
+	public static Process wget(String address, String localFile) {
 		throw new IllegalStateException("Not implemented");
 	}
 

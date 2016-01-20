@@ -32,6 +32,11 @@ import java.util.regex.Pattern;
  * Differently from traditional shell programs, but more closed to Java spirit,
  * programs launch Exceptions instead of returning an error code.
  * 
+ * If you want run a single Process, without pipelining, you can just call
+ * <code>.run()</code> instead of <code>.start()</code>. If you have built a
+ * pipeline, and you want wait for it to terminate before continuing, then...
+ * FIXME
+ * 
  * TODO: we don't have a good options handling system yet.
  * 
  * @author luca vercelli 2016
@@ -89,10 +94,10 @@ public abstract class Process extends Thread {
 	 * not an attribute of the Process, it is an attribute of the shell itself,
 	 * meaning that different concurrent shell may have different current
 	 * folders.
+	 * 
+	 * This must be an absolute path.
 	 */
 	private static String currentFolder = System.getProperty("user.dir");
-
-	// absolute path.
 
 	public Process(List<String> args) {
 		this.expArgs = expand(args);
@@ -163,13 +168,15 @@ public abstract class Process extends Thread {
 	 */
 	public Process pipe(Process p2) {
 		PipedInputStream pis = new PipedInputStream();
-		p2.setStdin(pis);
+		PipedOutputStream pos;
 		try {
-			this.setStdout(new PipedOutputStream(pis));
+			pos = new PipedOutputStream(pis);
 		} catch (IOException e) {
-			// why should it happen?
-			throw new IllegalStateException(e);
+			throw new RuntimeException(e); // why should this happen?
 		}
+
+		p2.setStdin(pis);
+		this.setStdout(pos);
 		p2.prec = this;
 		return p2;
 	}
@@ -240,7 +247,7 @@ public abstract class Process extends Thread {
 	 * @return this Program
 	 */
 	public Process redirect(String file) throws IOException {
-		setStdout(new FileOutputStream(new File(file)));
+		setStdout(new FileOutputStream(getAbsolutePath(file)));
 		return this;
 	}
 
@@ -251,7 +258,7 @@ public abstract class Process extends Thread {
 	 * @return this Program
 	 */
 	public Process append(String file) throws IOException {
-		setStdout(new FileOutputStream(new File(file), true));
+		setStdout(new FileOutputStream(getAbsolutePath(file), true));
 		return this;
 	}
 
@@ -262,7 +269,7 @@ public abstract class Process extends Thread {
 	 * @return this Program
 	 */
 	public Process redirectFrom(String file) throws IOException {
-		setStdin(new FileInputStream(file));
+		setStdin(new FileInputStream(getAbsolutePath(file)));
 		return this;
 	}
 
