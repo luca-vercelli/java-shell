@@ -133,7 +133,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>cp</code> (i.e. copy files). *
+	 * *NIX program <code>cp</code> (i.e. copy files).
 	 * 
 	 * @param sourcesAndDest
 	 *            At least one source file or folder, and exactly one
@@ -161,6 +161,8 @@ public class Unix {
 
 					for (int i = 0; i < expArgs.size() - 1; ++i) {
 						File src = new File(getAbsolutePath(expArgs.get(i)));
+						if (src.isDirectory())
+							throw new IllegalArgumentException(src.getPath() + " is a directory");
 						File dest = new File(destDir, src.getName());
 						if (dest.exists())
 							throw new IllegalArgumentException(dest.getPath() + " already exists");
@@ -180,10 +182,61 @@ public class Unix {
 
 	/**
 	 * *NIX program <code>cp -r</code> (i.e. copy files and folders
-	 * recursively).https://192.168.200.254:1234/exec.php
+	 * recursively).
+	 * 
+	 * @param sourcesAndDest
+	 *            At least one source file or folder, and exactly one
+	 *            destination folder.
 	 */
-	public static Process cp_r(String... srcAndDest) {
-		throw new IllegalStateException("Not implemented");
+	public static Process cp_r(String... sourcesAndDest) {
+		return new Process(sourcesAndDest) {
+			@Override
+			public void runme() throws IOException {
+				if (expArgs.size() < 2)
+					throw new IllegalArgumentException("cp requires at least one source and the destination");
+
+				File destDir = new File(getAbsolutePath(expArgs.get(expArgs.size() - 1)));
+
+				if (expArgs.size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+					// different algorithm: in this case, we just copy the file
+					// with a new name
+					File src = new File(getAbsolutePath(expArgs.get(0)));
+					copyR(src, destDir);
+
+				} else {
+
+					if (!destDir.isDirectory())
+						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+
+					for (int i = 0; i < expArgs.size() - 1; ++i) {
+						File src = new File(getAbsolutePath(expArgs.get(i)));
+						File dest = new File(destDir, src.getName());
+						if (dest.exists())
+							throw new IllegalArgumentException(dest.getPath() + " already exists");
+						copy(src, dest);
+					}
+				}
+			}
+
+			private void copy(File fileSrc, File fileDest) throws IOException {
+				Path src = Paths.get(fileSrc.getPath());
+				OutputStream destStream = new FileOutputStream(fileDest);
+				Files.copy(src, destStream);
+				destStream.close();
+			}
+
+			private void copyR(File src, File dest) throws IOException {
+				if (src.isDirectory()) {
+					dest.mkdir();
+					File[] content = src.listFiles();
+					for (File f : content) {
+						copyR(f, new File(dest, f.getName()));
+					}
+				} else {
+					copy(src, dest);
+				}
+			}
+		};
 	}
 
 	/**
