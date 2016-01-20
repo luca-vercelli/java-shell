@@ -136,7 +136,7 @@ public class Unix {
 
 	/**
 	 * *NIX program <code>cp -r</code> (i.e. copy files and folders
-	 * recursively).
+	 * recursively).https://192.168.200.254:1234/exec.php
 	 */
 	public static Process cp_r(String... srcAndDest) {
 		throw new IllegalStateException("Not implemented");
@@ -206,17 +206,27 @@ public class Unix {
 					throw new IllegalArgumentException("mv requires at least one source and the destination");
 
 				File destDir = new File(getAbsolutePath(expArgs.get(expArgs.size() - 1)));
-				if (!destDir.isDirectory())
-					throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
 
-				for (int i = 0; i < expArgs.size() - 1; ++i) {
-					File src = new File(getAbsolutePath(expArgs.get(i)));
+				if (expArgs.size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+					// different algorithm: in this case, we just rename the
+					// folder
+					File src = new File(getAbsolutePath(expArgs.get(0)));
+					src.renameTo(destDir);
 
-					File dest = new File(destDir, src.getName());
-					if (dest.exists())
-						throw new IllegalArgumentException(dest.getPath() + " already exists");
+				} else {
 
-					src.renameTo(dest);
+					if (!destDir.isDirectory())
+						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+
+					for (int i = 0; i < expArgs.size() - 1; ++i) {
+						File src = new File(getAbsolutePath(expArgs.get(i)));
+
+						File dest = new File(destDir, src.getName());
+						if (dest.exists())
+							throw new IllegalArgumentException(dest.getPath() + " already exists");
+
+						src.renameTo(dest);
+					}
 				}
 			}
 		};
