@@ -161,10 +161,15 @@ public abstract class Process extends Thread {
 	 * @return the second Program p2
 	 * @throws IOException
 	 */
-	public Process pipe(Process p2) throws IOException {
+	public Process pipe(Process p2) {
 		PipedInputStream pis = new PipedInputStream();
 		p2.setStdin(pis);
-		this.setStdout(new PipedOutputStream(pis));
+		try {
+			this.setStdout(new PipedOutputStream(pis));
+		} catch (IOException e) {
+			// why should it happen?
+			throw new IllegalStateException(e);
+		}
 		p2.prec = this;
 		return p2;
 	}

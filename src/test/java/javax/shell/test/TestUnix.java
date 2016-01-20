@@ -37,7 +37,7 @@ public class TestUnix {
 
 		List<Integer> processesRan = new ArrayList<Integer>();
 		List<String> linesReceived = new ArrayList<String>();
-		Process p = new SimpleProcess(1, processesRan, linesReceived);
+		Process p = new TesterProcess(1, processesRan, linesReceived);
 	}
 
 }
