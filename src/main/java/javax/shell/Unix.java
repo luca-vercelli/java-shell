@@ -491,9 +491,11 @@ public class Unix {
 
 	/**
 	 * *NIX program <code>wget</code> (i.e. download files from internet).
+	 * 
+	 * @throws IOException
 	 */
-	public static Process wget(String address, String localFile) {
-		throw new IllegalStateException("Not implemented");
+	public static Process wget(String address, String localFile) throws IOException {
+		return wget(address).redirect(localFile);
 	}
 
 }
