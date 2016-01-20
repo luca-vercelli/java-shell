@@ -3,8 +3,13 @@ package javax.shell;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
@@ -128,10 +133,49 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>cp</code> (i.e. copy files).
+	 * *NIX program <code>cp</code> (i.e. copy files). *
+	 * 
+	 * @param sourcesAndDest
+	 *            At least one source file or folder, and exactly one
+	 *            destination folder.
 	 */
-	public static Process cp(String... srcAndDest) {
-		throw new IllegalStateException("Not implemented");
+	public static Process cp(String... sourcesAndDest) {
+		return new Process(sourcesAndDest) {
+			@Override
+			public void runme() throws IOException {
+				if (expArgs.size() < 2)
+					throw new IllegalArgumentException("cp requires at least one source and the destination");
+
+				File destDir = new File(getAbsolutePath(expArgs.get(expArgs.size() - 1)));
+
+				if (expArgs.size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+					// different algorithm: in this case, we just copy the file
+					// with a new name
+					File src = new File(getAbsolutePath(expArgs.get(0)));
+					copy(src, destDir);
+
+				} else {
+
+					if (!destDir.isDirectory())
+						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+
+					for (int i = 0; i < expArgs.size() - 1; ++i) {
+						File src = new File(getAbsolutePath(expArgs.get(i)));
+						File dest = new File(destDir, src.getName());
+						if (dest.exists())
+							throw new IllegalArgumentException(dest.getPath() + " already exists");
+						copy(src, dest);
+					}
+				}
+			}
+
+			private void copy(File fileSrc, File fileDest) throws IOException {
+				Path src = Paths.get(fileSrc.getPath());
+				OutputStream destStream = new FileOutputStream(fileDest);
+				Files.copy(src, destStream);
+				destStream.close();
+			}
+		};
 	}
 
 	/**
@@ -140,6 +184,47 @@ public class Unix {
 	 */
 	public static Process cp_r(String... srcAndDest) {
 		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>mv</code> (i.e. move files).
+	 * 
+	 * @param sourcesAndDest
+	 *            At least one source file or folder, and exactly one
+	 *            destination folder.
+	 */
+	public static Process mv(String... sourcesAndDest) {
+		return new Process(sourcesAndDest) {
+			@Override
+			public void runme() {
+				if (expArgs.size() < 2)
+					throw new IllegalArgumentException("mv requires at least one source and the destination");
+
+				File destDir = new File(getAbsolutePath(expArgs.get(expArgs.size() - 1)));
+
+				if (expArgs.size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+					// different algorithm: in this case, we just rename the
+					// folder
+					File src = new File(getAbsolutePath(expArgs.get(0)));
+					src.renameTo(destDir);
+
+				} else {
+
+					if (!destDir.isDirectory())
+						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+
+					for (int i = 0; i < expArgs.size() - 1; ++i) {
+						File src = new File(getAbsolutePath(expArgs.get(i)));
+
+						File dest = new File(destDir, src.getName());
+						if (dest.exists())
+							throw new IllegalArgumentException(dest.getPath() + " already exists");
+
+						src.renameTo(dest);
+					}
+				}
+			}
+		};
 	}
 
 	/**
@@ -187,47 +272,6 @@ public class Unix {
 						rmRec(g);
 				}
 				f.delete();
-			}
-		};
-	}
-
-	/**
-	 * *NIX program <code>mv</code> (i.e. move files).
-	 * 
-	 * @param sourcesAndDest
-	 *            At least one source file or folder, and exactly one
-	 *            destination folder.
-	 */
-	public static Process mv(String... sourcesAndDest) {
-		return new Process(sourcesAndDest) {
-			@Override
-			public void runme() {
-				if (expArgs.size() < 2)
-					throw new IllegalArgumentException("mv requires at least one source and the destination");
-
-				File destDir = new File(getAbsolutePath(expArgs.get(expArgs.size() - 1)));
-
-				if (expArgs.size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
-					// different algorithm: in this case, we just rename the
-					// folder
-					File src = new File(getAbsolutePath(expArgs.get(0)));
-					src.renameTo(destDir);
-
-				} else {
-
-					if (!destDir.isDirectory())
-						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
-
-					for (int i = 0; i < expArgs.size() - 1; ++i) {
-						File src = new File(getAbsolutePath(expArgs.get(i)));
-
-						File dest = new File(destDir, src.getName());
-						if (dest.exists())
-							throw new IllegalArgumentException(dest.getPath() + " already exists");
-
-						src.renameTo(dest);
-					}
-				}
 			}
 		};
 	}
