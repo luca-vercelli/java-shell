@@ -73,7 +73,7 @@ public abstract class Process extends Thread {
 	/**
 	 * All arguments passed to the program, already shell-expanded.
 	 */
-	protected List<String> args = null;
+	protected List<String> expArgs = null;
 
 	/**
 	 * Previous {@see Process} in pipeline.
@@ -95,15 +95,15 @@ public abstract class Process extends Thread {
 	// absolute path.
 
 	public Process(List<String> args) {
-		this.args = expand(args);
+		this.expArgs = expand(args);
 	}
 
 	public Process(String[] args) {
-		this.args = expand(Arrays.asList(args));
+		this.expArgs = expand(Arrays.asList(args));
 	}
 
 	public Process() {
-		this.args = new ArrayList<String>();
+		this.expArgs = new ArrayList<String>();
 	}
 
 	public void setStdin(InputStream is) {

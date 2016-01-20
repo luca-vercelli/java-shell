@@ -89,39 +89,41 @@ public class Unix {
 		return new Process(args) {
 			@Override
 			public void runme() throws Exception {
-				for (String s : args)
+				for (String s : expArgs)
 					stdout.print(s + " ");
 				stdout.println();
 			}
 		};
 	}
 
-	private static File[] ls1(String arg) throws FileNotFoundException {
-		File f = new File(arg);
-		if (!f.exists())
-			throw new FileNotFoundException();
-		if (f.isDirectory())
-			return f.listFiles();
-		else
-			return new File[] { f };
-	}
-
 	/**
-	 * *NIX program <code>ls</code> (i.e. list directory).
+	 * *NIX program <code>ls</code> (i.e. list directory). Do not print hidden
+	 * files.
 	 */
 	public static Process ls(String... args) {
 		return new Process(args) {
 			@Override
 			public void runme() throws FileNotFoundException {
-				if (args.isEmpty())
-					args.add(".");
+				if (expArgs.isEmpty())
+					expArgs.add(".");
 
-				for (String arg : args) {
+				for (String arg : expArgs) {
 					File[] files = ls1(arg);
 					for (File f : files)
 						stdout.println(f.getName());
 				}
 			}
+
+			private File[] ls1(String arg) throws FileNotFoundException {
+				File f = new File(arg);
+				if (!f.exists())
+					throw new FileNotFoundException();
+				if (f.isDirectory())
+					return f.listFiles();
+				else
+					return new File[] { f };
+			}
+
 		};
 	}
 
@@ -133,24 +135,104 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>rm</code> (i.e. remove files).
+	 * *NIX program <code>cp -r</code> (i.e. copy files and folders
+	 * recursively).
 	 */
-	public static Process rm(String... src) {
+	public static Process cp_r(String... srcAndDest) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
-	 * *NIX program <code>mv</code> (i.e. move files).
+	 * *NIX program <code>rm -f</code> (i.e. remove files). No error is given if
+	 * file does not exists. An error is given if file is a directory.
 	 */
-	public static Process mv(String options, String... srcAndDest) {
-		throw new IllegalStateException("Not implemented");
+	public static Process rm(String... src) {
+		return new Process(src) {
+			@Override
+			public void runme() {
+				for (String s : expArgs) {
+					File f = new File(getAbsolutePath(s));
+					if (!f.exists())
+						continue;
+					if (f.isDirectory())
+						throw new IllegalArgumentException(f.getPath() + " is a directory");
+					f.delete();
+				}
+			}
+		};
+	}
+
+	/**
+	 * *NIX program <code>rm -rf</code> (i.e. remove files and folders
+	 * recursively). No error is given ithrow new
+	 * IllegalArgumentException(f.getPath() + " is a directory");f file does not
+	 * exists.
+	 */
+	public static Process rm_r(String... src) {
+		return new Process(src) {
+			@Override
+			public void runme() {
+				for (String s : expArgs) {
+					File f = new File(getAbsolutePath(s));
+					rmRec(f);
+				}
+			}
+
+			private void rmRec(File f) {
+				if (!f.exists())
+					return;
+				if (f.isDirectory()) {
+					File[] content = f.listFiles();
+					for (File g : content)
+						rmRec(g);
+				}
+				f.delete();
+			}
+		};
+	}
+
+	/**
+	 * *NIX program <code>mv</code> (i.e. move files).
+	 * 
+	 * @param sourcesAndDest
+	 *            At least one source file or folder, and exactly one
+	 *            destination folder.
+	 */
+	public static Process mv(String... sourcesAndDest) {
+		return new Process(sourcesAndDest) {
+			@Override
+			public void runme() {
+				if (expArgs.size() < 2)
+					throw new IllegalArgumentException("mv requires at least one source and the destination");
+
+				File destDir = new File(getAbsolutePath(expArgs.get(expArgs.size() - 1)));
+				if (!destDir.isDirectory())
+					throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+
+				for (int i = 0; i < expArgs.size() - 1; ++i) {
+					File src = new File(getAbsolutePath(expArgs.get(i)));
+
+					File dest = new File(destDir, src.getName());
+					if (dest.exists())
+						throw new IllegalArgumentException(dest.getPath() + " already exists");
+
+					src.renameTo(dest);
+				}
+			}
+		};
 	}
 
 	/**
 	 * *NIX program <code>mkdir</code> (i.e. make directory).
 	 */
 	public static Process mkdir(String... folders) {
-		throw new IllegalStateException("Not implemented");
+		return new Process(folders) {
+			@Override
+			public void runme() {
+				for (String s : expArgs)
+					new File(getAbsolutePath(s)).mkdir();
+			}
+		};
 	}
 
 	/**
@@ -158,14 +240,38 @@ public class Unix {
 	 * upper levels).
 	 */
 	public static Process mkdir_p(String... folders) {
-		throw new IllegalStateException("Not implemented");
+		return new Process(folders) {
+			@Override
+			public void runme() {
+				for (String s : expArgs)
+					new File(getAbsolutePath(s)).mkdirs();
+			}
+		};
 	}
 
 	/**
-	 * *NIX program <code>rmdir</code> (i.e. remove empty directories).
+	 * *NIX program <code>rmdir</code> (i.e. remove empty directories). No error
+	 * is given if folder does not exists. An error is given if file is not a
+	 * directory, or the directory is not empty.h hidden //
 	 */
 	public static Process rmdir(String... folders) {
-		throw new IllegalStateException("Not implemented");
+		return new Process(folders) {
+			@Override
+			public void runme() {
+				for (String s : expArgs) {
+					File f = new File(getAbsolutePath(s));
+					if (!f.exists())
+						continue;
+					if (!f.isDirectory())
+						throw new IllegalArgumentException(f.getPath() + " is not a directory");
+					if (f.list().length > 0) {
+						// FIXME does not catch hidden files
+						throw new IllegalArgumentException(f.getPath() + " is not empty");
+					}
+					f.delete();
+				}
+			}
+		};
 	}
 
 	/**
@@ -183,7 +289,7 @@ public class Unix {
 			@Override
 			public void runme() throws IOException {
 
-				List<InputStream> sources = this.getInputStreams(args);
+				List<InputStream> sources = this.getInputStreams(expArgs);
 				for (InputStream is : sources) {
 					byte[] buffer = new byte[1024];
 					int len;
@@ -204,7 +310,7 @@ public class Unix {
 			@Override
 			public void runme() throws IOException {
 
-				List<BufferedReader> sources = this.getReaders(args);
+				List<BufferedReader> sources = this.getReaders(expArgs);
 				for (BufferedReader is : sources) {
 					while (is.ready()) {
 						String line = is.readLine();
@@ -225,7 +331,7 @@ public class Unix {
 			@Override
 			public void runme() throws IOException {
 
-				List<BufferedReader> sources = this.getReaders(args);
+				List<BufferedReader> sources = this.getReaders(expArgs);
 				for (BufferedReader is : sources) {
 					while (is.ready()) {
 						String line = is.readLine();
