@@ -165,6 +165,11 @@ public abstract class Process extends Thread {
 			System.err.println("Unhandled exception in Thread " + this.getName());
 			e.printStackTrace(System.err);
 		}
+		if (stdout != null)
+			try {
+				stdout.close();
+			} catch (RuntimeException ne) {
+			}
 	}
 
 	/**
