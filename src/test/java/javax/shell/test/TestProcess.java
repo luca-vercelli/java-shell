@@ -67,7 +67,6 @@ public class TestProcess {
 	@Test
 	public void testPipelines() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
-		final List<String> linesReceived = new ArrayList<String>();
 
 		Process p1 = new Process() {
 			@Override
@@ -79,18 +78,20 @@ public class TestProcess {
 			}
 		};
 
-		Process p2 = new TesterProcess(2, processesRan, linesReceived);
+		TesterProcess p2 = new TesterProcess(2, processesRan);
 
-		p1.pipe(p2).sh();
+		TesterProcess p3 = new TesterProcess(3, processesRan);
 
-		assertEquals("Two processes ran", 2, processesRan.size());
-		assertEquals("3 lines should be elaborated", 3, linesReceived.size());
+		p1.pipe(p2).pipe(p3).sh();
+
+		assertEquals("Two processes ran", 3, processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived().size());
+		assertEquals("3 lines should be elaborated", 3, p3.getLinesReceived().size());
 	}
 
 	@Test
 	public void testAnd() {
 		final List<Integer> processesRan = new ArrayList<Integer>();
-		final List<String> linesReceived = new ArrayList<String>();
 
 		Process p1 = new Process() {
 			@Override
@@ -102,18 +103,17 @@ public class TestProcess {
 			}
 		};
 
-		Process p2 = new TesterProcess(2, processesRan, linesReceived);
+		TesterProcess p2 = new TesterProcess(2, processesRan);
 
 		p1.and(p2).sh();
 
 		assertEquals("Two processes ran", 2, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, linesReceived.size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
 	}
 
 	@Test
 	public void testAnd2() {
 		final List<Integer> processesRan = new ArrayList<Integer>();
-		final List<String> linesReceived = new ArrayList<String>();
 
 		Process p1 = new Process() {
 			@Override
@@ -123,18 +123,17 @@ public class TestProcess {
 			}
 		};
 
-		Process p2 = new TesterProcess(2, processesRan, linesReceived);
+		TesterProcess p2 = new TesterProcess(2, processesRan);
 
 		p1.and(p2).sh();
 
 		assertEquals("1 processes ran", 1, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, linesReceived.size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
 	}
 
 	@Test
 	public void testOr() {
 		final List<Integer> processesRan = new ArrayList<Integer>();
-		final List<String> linesReceived = new ArrayList<String>();
 
 		Process p1 = new Process() {
 			@Override
@@ -146,18 +145,17 @@ public class TestProcess {
 			}
 		};
 
-		Process p2 = new TesterProcess(2, processesRan, linesReceived);
+		TesterProcess p2 = new TesterProcess(2, processesRan);
 
 		p1.or(p2).sh();
 
 		assertEquals("1 process ran", 1, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, linesReceived.size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
 	}
 
 	@Test
 	public void testOr2() {
 		final List<Integer> processesRan = new ArrayList<Integer>();
-		final List<String> linesReceived = new ArrayList<String>();
 
 		Process p1 = new Process() {
 			@Override
@@ -167,11 +165,11 @@ public class TestProcess {
 			}
 		};
 
-		Process p2 = new TesterProcess(2, processesRan, linesReceived);
+		TesterProcess p2 = new TesterProcess(2, processesRan);
 
 		p1.or(p2).sh();
 
 		assertEquals("2 processes ran", 2, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, linesReceived.size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
 	}
 }
