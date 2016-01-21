@@ -149,7 +149,7 @@ public abstract class Process extends Thread {
 		try {
 			join();
 		} catch (InterruptedException e) {
-			// why here?
+			// somebody stopped the thread?!?
 			throw new RuntimeException(e);
 		}
 	}
@@ -412,6 +412,10 @@ public abstract class Process extends Thread {
 
 	private static void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
 
+		// DEBUG CODE
+		// System.out.println("DEBUG. entering expandRecursive(" + root + ", " +
+		// pieces + ", " + ret);
+
 		if (!root.exists())
 			return;
 
@@ -443,6 +447,10 @@ public abstract class Process extends Thread {
 		}
 
 		pieces.push(nextPiece);
+
+		// DEBUG CODE
+		// System.out.println("DEBUG. exiting expandRecursive(" + root + ", " +
+		// pieces + ", " + ret);
 	}
 
 	/**
@@ -452,15 +460,20 @@ public abstract class Process extends Thread {
 		if (paths == null)
 			throw new IllegalArgumentException("null paths given");
 
+		// DEBUG CODE
+		// System.out.println("expand:" + paths);
+
 		Set<String> ret = new HashSet<String>();
 		for (String path : paths) {
 
 			if (path == null)
 				continue; // should not happen ... but...
 
-			if (!path.contains("*") && !path.contains("?"))
-				ret.add(path); // e.g. a fixed filename, empty string, or
-								// options
+			if (!path.contains("*") && !path.contains("?")) {
+				// e.g. a fixed filename, empty string, or options
+				ret.add(path);
+				continue;
+			}
 
 			// here, we *must* perform expansion
 
