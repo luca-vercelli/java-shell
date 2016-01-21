@@ -79,6 +79,11 @@ public abstract class Process extends Thread {
 	protected PrintStream stdout = System.out;
 
 	/**
+	 * Standard error
+	 */
+	protected PrintStream stderr = System.err;
+
+	/**
 	 * All arguments passed to the program, already shell-expanded.
 	 */
 	protected List<String> expArgs = null;
@@ -121,6 +126,10 @@ public abstract class Process extends Thread {
 
 	public void setStdout(OutputStream os) {
 		stdout = new PrintStream(os);
+	}
+
+	public void setStderr(OutputStream os) {
+		stderr = new PrintStream(os);
 	}
 
 	public static String getCurrentFolder() {
