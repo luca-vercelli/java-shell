@@ -8,10 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -544,4 +541,31 @@ public class Unix {
 		return wget(address).redirect(localFile);
 	}
 
+	/**
+	 * *NIX program <code>zip</code> (i.e. add/update files to archive).
+	 */
+	public static Process zip(String args) {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>unzip</code> (i.e. extract files from archive).
+	 */
+	public static Process unzip(String args) {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>tar -c</code> (i.e. add/update files to archive).
+	 */
+	public static Process tar_c(String args) {
+		throw new IllegalStateException("Not implemented");
+	}
+
+	/**
+	 * *NIX program <code>tar -x</code> (i.e. extract files from archive).
+	 */
+	public static Process tar_x(String args) {
+		throw new IllegalStateException("Not implemented");
+	}
 }
