@@ -28,6 +28,18 @@ public class TestUnix {
 	}
 
 	@Test
+	public void testCd() {
+		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
+
+		List<Integer> processesRan = new ArrayList<Integer>();
+		TesterProcess p3 = new TesterProcess(3, processesRan);
+
+		cd("dir2").and(ls("file*")).pipe(p3).sh();
+
+		assertEquals("There should be 1 file here", 1, p3.getLinesReceived().size());
+	}
+
+	@Test
 	public void testEcho() {
 		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
 
