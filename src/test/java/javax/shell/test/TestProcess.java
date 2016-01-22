@@ -30,38 +30,45 @@ public class TestProcess {
 	@Test
 	public void testExpansion() {
 
-		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
+		Process p = new Process() {
+
+			@Override
+			public void runme() throws Exception {
+			}
+		};
+
+		p.setCurrentFolder(resourcesFolder.getAbsolutePath());
 
 		List<String> args, exp;
 
 		args = new ArrayList<String>();
 		args.add("./dir1/file*");
-		exp = Process.expand(args);
+		exp = p.expand(args);
 		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("dir1/file*");
-		exp = Process.expand(args);
+		exp = p.expand(args);
 		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("dir1/file?.txt");
-		exp = Process.expand(args);
+		exp = p.expand(args);
 		assertEquals("There are 2 files .txt here", 2, exp.size());
 
 		args = new ArrayList<String>();
 		args.add(resourcesFolder.getAbsolutePath() + "/dir1/file?.txt");
-		exp = Process.expand(args);
+		exp = p.expand(args);
 		assertEquals("There are 2 files .txt here", 2, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("/file?.txt");
-		exp = Process.expand(args);
+		exp = p.expand(args);
 		assertTrue("No file should be there", exp.isEmpty());
 
 		args = new ArrayList<String>();
 		args.add("*/file*.txt");
-		exp = Process.expand(args);
+		exp = p.expand(args);
 		assertEquals("There are 2+1=3 files .txt", 3, exp.size());
 
 	}
@@ -178,7 +185,6 @@ public class TestProcess {
 	@Test
 	public void testAndStdout() throws IOException {
 
-		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
 		File temp = File.createTempFile("output", ".tmp");
 		temp.deleteOnExit();
 

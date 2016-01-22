@@ -98,18 +98,9 @@ public abstract class Process extends Thread {
 	protected Process prec = null;
 
 	/**
-	 * Recall that in Java there is not good "current folder", so we store it
-	 * here.
-	 * 
-	 * This attribute is static, that means that we can have only one shell at
-	 * the time. Please notice that, in a "philosophical" perspective, this is
-	 * not an attribute of the Process, it is an attribute of the shell itself,
-	 * meaning that different concurrent shell may have different current
-	 * folders.
-	 * 
-	 * This must be an absolute path.
+	 * Shell in which the Program is executed
 	 */
-	private static String currentFolder = System.getProperty("user.dir");
+	protected Shell shell = Shell.getInstance();
 
 	public Process(List<String> args) {
 		this.args = args;
@@ -136,12 +127,12 @@ public abstract class Process extends Thread {
 		stderr = new PrintStream(os);
 	}
 
-	public static String getCurrentFolder() {
-		return currentFolder;
+	public String getCurrentFolder() {
+		return shell.getCurrentFolder();
 	}
 
-	public static void setCurrentFolder(String currentFolder) {
-		Process.currentFolder = currentFolder;
+	public void setCurrentFolder(String currentFolder) {
+		shell.setCurrentFolder(currentFolder);
 	}
 
 	public List<String> expArgs() {
@@ -404,14 +395,14 @@ public abstract class Process extends Thread {
 	 * the "root": it is the path's root ( "/" or "C:\" ) if the given path is
 	 * absolute, or current folder if it is relative.
 	 */
-	protected static String[] splitRoot(String path) {
+	protected String[] splitRoot(String path) {
 
 		String[] pieces = path.split(File.separator);
 
 		if (!isAbsolute(path)) {
 
 			String[] result = new String[pieces.length + 1];
-			result[0] = currentFolder;
+			result[0] = getCurrentFolder();
 			for (int i = 0; i < pieces.length; ++i)
 				result[i + 1] = pieces[i];
 			return result;
@@ -436,17 +427,17 @@ public abstract class Process extends Thread {
 	 * Return the absolute path corresponding to the given path. We cannot trust
 	 * of File.getAbsolutePath(). Wildchards supported.
 	 */
-	protected static String getAbsolutePath(String path) {
+	protected String getAbsolutePath(String path) {
 
 		if (isAbsolute(path))
 			return path;
 
 		// here, the path is relative, and it is not null nor empty.
 
-		return Process.getCurrentFolder() + File.separator + path.trim();
+		return getCurrentFolder() + File.separator + path.trim();
 	}
 
-	private static void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
+	private void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
 
 		// DEBUG CODE
 		// System.out.println("DEBUG. entering expandRecursive(" + root + ", " +
@@ -492,7 +483,7 @@ public abstract class Process extends Thread {
 	/**
 	 * Shell-expansion of arguments
 	 */
-	public static List<String> expand(List<String> paths) {
+	public List<String> expand(List<String> paths) {
 		if (paths == null)
 			throw new IllegalArgumentException("null paths given");
 

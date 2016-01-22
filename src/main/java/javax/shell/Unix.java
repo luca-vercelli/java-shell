@@ -42,7 +42,7 @@ public class Unix {
 		return new Process() {
 			@Override
 			public void runme() throws Exception {
-				stdout.println(Process.getCurrentFolder());
+				stdout.println(getCurrentFolder());
 			}
 		};
 	}
@@ -54,7 +54,7 @@ public class Unix {
 		return new Process() {
 			@Override
 			public void runme() throws Exception {
-				Process.setCurrentFolder(getAbsolutePath(folder));
+				setCurrentFolder(getAbsolutePath(folder));
 			}
 		};
 	}
@@ -69,8 +69,8 @@ public class Unix {
 		return new Process() {
 			@Override
 			public void runme() throws Exception {
-				historyFolders.push(Process.getCurrentFolder());
-				Process.setCurrentFolder(getAbsolutePath(folder));
+				historyFolders.push(getCurrentFolder());
+				setCurrentFolder(getAbsolutePath(folder));
 			}
 		};
 	}
@@ -84,7 +84,7 @@ public class Unix {
 		return new Process() {
 			@Override
 			public void runme() throws EmptyStackException {
-				Process.setCurrentFolder(historyFolders.pop());
+				setCurrentFolder(historyFolders.pop());
 			}
 		};
 	}

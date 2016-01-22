@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.shell.Process;
 import static javax.shell.Unix.*;
 
 import org.junit.BeforeClass;
@@ -29,7 +28,7 @@ public class TestUnix {
 
 	@Test
 	public void testCd() {
-		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
+		cd(resourcesFolder.getAbsolutePath());
 
 		List<Integer> processesRan = new ArrayList<Integer>();
 		TesterProcess p3 = new TesterProcess(3, processesRan);
@@ -41,7 +40,7 @@ public class TestUnix {
 
 	@Test
 	public void testEcho() {
-		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
+		cd(resourcesFolder.getAbsolutePath());
 
 		List<Integer> processesRan = new ArrayList<Integer>();
 		TesterProcess p2 = new TesterProcess(1, processesRan);
@@ -53,7 +52,7 @@ public class TestUnix {
 
 	@Test
 	public void testCatGrep() {
-		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
+		cd(resourcesFolder.getAbsolutePath());
 
 		List<Integer> processesRan = new ArrayList<Integer>();
 		TesterProcess p2 = new TesterProcess(2, processesRan);
@@ -68,7 +67,7 @@ public class TestUnix {
 	@Test
 	public void testLs() throws InterruptedException {
 
-		Process.setCurrentFolder(resourcesFolder.getAbsolutePath());
+		cd(resourcesFolder.getAbsolutePath());
 
 		List<Integer> processesRan = new ArrayList<Integer>();
 		TesterProcess p2 = new TesterProcess(1, processesRan);
