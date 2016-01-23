@@ -22,7 +22,7 @@ public class Shell {
 			sh = new Shell();
 			instances.put(Thread.currentThread(), sh);
 		}
-		return null;
+		return sh;
 	}
 
 	public String getCurrentFolder() {
