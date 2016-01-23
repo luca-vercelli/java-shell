@@ -50,11 +50,13 @@ public class Unix {
 	/**
 	 * *NIX shell command <code>cd</code> (i.e. change directory).
 	 */
-	public static Process cd(final String folder) {
-		return new Process() {
+	public static Process cd(String folder) {
+		return new Process(folder) {
 			@Override
-			public void runme() throws Exception {
-				setCurrentFolder(getAbsolutePath(folder));
+			public void runme() {
+				if (expArgs().isEmpty())
+					throw new IllegalArgumentException("Argument missing");
+				setCurrentFolder(getAbsolutePath(expArgs().get(0)));
 			}
 		};
 	}
@@ -146,11 +148,14 @@ public class Unix {
 			@Override
 			public void runme() throws IOException {
 				if (expArgs().size() < 2)
-					throw new IllegalArgumentException("cp requires at least one source and the destination");
+					throw new IllegalArgumentException(
+							"cp requires at least one source and the destination");
 
-				File destDir = new File(getAbsolutePath(expArgs().get(expArgs().size() - 1)));
+				File destDir = new File(getAbsolutePath(expArgs().get(
+						expArgs().size() - 1)));
 
-				if (expArgs().size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+				if (expArgs().size() == 2 && !destDir.exists()
+						&& destDir.getParentFile().isDirectory()) {
 					// different algorithm: in this case, we just copy the file
 					// with a new name
 					File src = new File(getAbsolutePath(expArgs().get(0)));
@@ -159,15 +164,18 @@ public class Unix {
 				} else {
 
 					if (!destDir.isDirectory())
-						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+						throw new IllegalArgumentException(destDir.getPath()
+								+ " does not exist or is not a folder");
 
 					for (int i = 0; i < expArgs().size() - 1; ++i) {
 						File src = new File(getAbsolutePath(expArgs().get(i)));
 						if (src.isDirectory())
-							throw new IllegalArgumentException(src.getPath() + " is a directory");
+							throw new IllegalArgumentException(src.getPath()
+									+ " is a directory");
 						File dest = new File(destDir, src.getName());
 						if (dest.exists())
-							throw new IllegalArgumentException(dest.getPath() + " already exists");
+							throw new IllegalArgumentException(dest.getPath()
+									+ " already exists");
 						copy(src, dest);
 					}
 				}
@@ -195,11 +203,14 @@ public class Unix {
 			@Override
 			public void runme() throws IOException {
 				if (expArgs().size() < 2)
-					throw new IllegalArgumentException("cp requires at least one source and the destination");
+					throw new IllegalArgumentException(
+							"cp requires at least one source and the destination");
 
-				File destDir = new File(getAbsolutePath(expArgs().get(expArgs().size() - 1)));
+				File destDir = new File(getAbsolutePath(expArgs().get(
+						expArgs().size() - 1)));
 
-				if (expArgs().size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+				if (expArgs().size() == 2 && !destDir.exists()
+						&& destDir.getParentFile().isDirectory()) {
 					// different algorithm: in this case, we just copy the file
 					// with a new name
 					File src = new File(getAbsolutePath(expArgs().get(0)));
@@ -208,13 +219,15 @@ public class Unix {
 				} else {
 
 					if (!destDir.isDirectory())
-						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+						throw new IllegalArgumentException(destDir.getPath()
+								+ " does not exist or is not a folder");
 
 					for (int i = 0; i < expArgs().size() - 1; ++i) {
 						File src = new File(getAbsolutePath(expArgs().get(i)));
 						File dest = new File(destDir, src.getName());
 						if (dest.exists())
-							throw new IllegalArgumentException(dest.getPath() + " already exists");
+							throw new IllegalArgumentException(dest.getPath()
+									+ " already exists");
 						copy(src, dest);
 					}
 				}
@@ -253,11 +266,14 @@ public class Unix {
 			@Override
 			public void runme() {
 				if (expArgs().size() < 2)
-					throw new IllegalArgumentException("mv requires at least one source and the destination");
+					throw new IllegalArgumentException(
+							"mv requires at least one source and the destination");
 
-				File destDir = new File(getAbsolutePath(expArgs().get(expArgs().size() - 1)));
+				File destDir = new File(getAbsolutePath(expArgs().get(
+						expArgs().size() - 1)));
 
-				if (expArgs().size() == 2 && !destDir.exists() && destDir.getParentFile().isDirectory()) {
+				if (expArgs().size() == 2 && !destDir.exists()
+						&& destDir.getParentFile().isDirectory()) {
 					// different algorithm: in this case, we just rename the
 					// folder
 					File src = new File(getAbsolutePath(expArgs().get(0)));
@@ -266,14 +282,16 @@ public class Unix {
 				} else {
 
 					if (!destDir.isDirectory())
-						throw new IllegalArgumentException(destDir.getPath() + " does not exist or is not a folder");
+						throw new IllegalArgumentException(destDir.getPath()
+								+ " does not exist or is not a folder");
 
 					for (int i = 0; i < expArgs().size() - 1; ++i) {
 						File src = new File(getAbsolutePath(expArgs().get(i)));
 
 						File dest = new File(destDir, src.getName());
 						if (dest.exists())
-							throw new IllegalArgumentException(dest.getPath() + " already exists");
+							throw new IllegalArgumentException(dest.getPath()
+									+ " already exists");
 
 						src.renameTo(dest);
 					}
@@ -295,7 +313,8 @@ public class Unix {
 					if (!f.exists())
 						continue;
 					if (f.isDirectory())
-						throw new IllegalArgumentException(f.getPath() + " is a directory");
+						throw new IllegalArgumentException(f.getPath()
+								+ " is a directory");
 					f.delete();
 				}
 			}
@@ -372,10 +391,12 @@ public class Unix {
 					if (!f.exists())
 						continue;
 					if (!f.isDirectory())
-						throw new IllegalArgumentException(f.getPath() + " is not a directory");
+						throw new IllegalArgumentException(f.getPath()
+								+ " is not a directory");
 					if (f.list().length > 0) {
 						// FIXME does not catch hidden files
-						throw new IllegalArgumentException(f.getPath() + " is not empty");
+						throw new IllegalArgumentException(f.getPath()
+								+ " is not empty");
 					}
 					f.delete();
 				}
@@ -517,7 +538,8 @@ public class Unix {
 	 * 
 	 * @throws IOException
 	 */
-	public static Process wget(String address, String localFile) throws IOException {
+	public static Process wget(String address, String localFile)
+			throws IOException {
 		return wget(address).redirect(localFile);
 	}
 

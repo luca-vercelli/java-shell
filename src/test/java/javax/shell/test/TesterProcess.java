@@ -11,7 +11,8 @@ public class TesterProcess extends Process {
 	Integer id = null;
 	List<String> linesReceived = null;
 
-	public TesterProcess(int id, List<Integer> processesRan, List<String> linesReceived) {
+	public TesterProcess(int id, List<Integer> processesRan,
+			List<String> linesReceived) {
 		this.processesRan = processesRan;
 		this.id = id;
 		this.linesReceived = linesReceived;
@@ -25,6 +26,10 @@ public class TesterProcess extends Process {
 
 	@Override
 	public void runme() throws Exception {
+
+		// DEBUG CODE
+		System.out.println("HERE TesterProcess " + id);
+
 		while (stdinReader.ready()) {
 			String line = stdinReader.readLine();
 			linesReceived.add(line);

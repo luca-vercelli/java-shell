@@ -14,14 +14,19 @@ import java.util.Map;
  */
 public class Shell {
 
-	private static Map<Thread, Shell> instances = new HashMap<Thread, Shell>();
+	private static Map<String, Shell> instances = new HashMap<String, Shell>();
 
 	public static Shell getInstance() {
-		Shell sh = instances.get(Thread.currentThread());
+		String threadName = Thread.currentThread().getName();
+		Shell sh = instances.get(threadName);
 		if (sh == null) {
 			sh = new Shell();
-			instances.put(Thread.currentThread(), sh);
+			instances.put(threadName, sh);
 		}
+
+		// DEBUG CODE
+		System.out.println("Returning Shell: " + sh);
+
 		return sh;
 	}
 
@@ -55,7 +60,7 @@ public class Shell {
 	 * 
 	 * This must be an absolute path.
 	 */
-	private String currentFolder;
+	private String currentFolder = System.getProperty("user.dir");
 
 	/**
 	 * Properties

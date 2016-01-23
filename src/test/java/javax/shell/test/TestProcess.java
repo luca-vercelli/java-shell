@@ -23,8 +23,10 @@ public class TestProcess {
 		// FIXME this only works if not packaged
 		URL resource = TestUnix.class.getResource("/dir1/file1.txt");
 		assertTrue("Resources file not found?!?", resource != null);
-		resourcesFolder = new File(resource.toURI()).getParentFile().getParentFile();
-		assertTrue("Resources folder " + resourcesFolder + " not found?!?", resourcesFolder.exists());
+		resourcesFolder = new File(resource.toURI()).getParentFile()
+				.getParentFile();
+		assertTrue("Resources folder " + resourcesFolder + " not found?!?",
+				resourcesFolder.exists());
 	}
 
 	@Test
@@ -94,8 +96,10 @@ public class TestProcess {
 		p1.pipe(p2).pipe(p3).sh();
 
 		assertEquals("3 processes ran", 3, processesRan.size());
-		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived().size());
-		assertEquals("3 lines should be elaborated", 3, p3.getLinesReceived().size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
+				.size());
+		assertEquals("3 lines should be elaborated", 3, p3.getLinesReceived()
+				.size());
 	}
 
 	@Test
@@ -117,7 +121,8 @@ public class TestProcess {
 		p1.and(p2).sh();
 
 		assertEquals("Two processes ran", 2, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
+				.size());
 	}
 
 	@Test
@@ -137,7 +142,8 @@ public class TestProcess {
 		p1.and(p2).sh();
 
 		assertEquals("1 processes ran", 1, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
+				.size());
 	}
 
 	@Test
@@ -159,7 +165,8 @@ public class TestProcess {
 		p1.or(p2).sh();
 
 		assertEquals("1 process ran", 1, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
+				.size());
 	}
 
 	@Test
@@ -179,7 +186,8 @@ public class TestProcess {
 		p1.or(p2).sh();
 
 		assertEquals("2 processes ran", 2, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
+				.size());
 	}
 
 	@Test
