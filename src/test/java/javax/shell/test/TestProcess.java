@@ -76,7 +76,7 @@ public class TestProcess {
 	}
 
 	@Test
-	public void testPipelines() throws IOException {
+	public void testPipelines3() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
 		Process p1 = new Process() {
@@ -128,7 +128,7 @@ public class TestProcess {
 	}
 
 	@Test
-	public void testPipelines3() throws IOException {
+	public void testPipelinesWithWriteDelay() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
 		Process p1 = new Process() {
@@ -153,7 +153,7 @@ public class TestProcess {
 	}
 
 	@Test
-	public void testPipelines4() throws IOException {
+	public void testPipelinesWithReadDelay() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
 		Process p1 = new Process() {
@@ -213,7 +213,7 @@ public class TestProcess {
 			@Override
 			public void runme() throws Exception {
 				processesRan.add(1);
-				throw new IllegalStateException();
+				throw new RuntimeException("This exception is a test");
 			}
 		};
 
@@ -257,7 +257,7 @@ public class TestProcess {
 			@Override
 			public void runme() throws Exception {
 				processesRan.add(1);
-				throw new IllegalStateException();
+				throw new RuntimeException("This exception is a test");
 			}
 		};
 
@@ -271,7 +271,7 @@ public class TestProcess {
 	}
 
 	@Test
-	public void testAndStdout() throws IOException {
+	public void testAndWithReadDelay() throws IOException {
 
 		File temp = File.createTempFile("output", ".tmp");
 		temp.deleteOnExit();
@@ -284,7 +284,7 @@ public class TestProcess {
 			@Override
 			public void runme() throws Exception {
 				processesRan.add(1);
-				Thread.sleep(5000);
+				Thread.sleep(1000);
 			}
 		};
 
