@@ -81,7 +81,7 @@ public class TestProcess {
 
 		Process p1 = new Process() {
 			@Override
-			public void runme() throws Exception {
+			public void runme() {
 				processesRan.add(1);
 				stdout.println("ehlo");
 				stdout.println("mydarling");
@@ -95,10 +95,90 @@ public class TestProcess {
 
 		p1.pipe(p2).pipe(p3).sh();
 
-		assertEquals("3 processes ran", 3, processesRan.size());
+		assertEquals("3 processes ran, not " + processesRan, 3,
+				processesRan.size());
 		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
 				.size());
 		assertEquals("3 lines should be elaborated", 3, p3.getLinesReceived()
+				.size());
+	}
+
+	@Test
+	public void testPipelines2() throws IOException {
+		final List<Integer> processesRan = new ArrayList<Integer>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() {
+				processesRan.add(1);
+				stdout.println("ehlo");
+				stdout.println("mydarling");
+				stdout.println("seeyou");
+			}
+		};
+
+		TesterProcess p2 = new TesterProcess(2, processesRan);
+
+		p1.pipe(p2).sh();
+
+		assertEquals("2 processes ran, not " + processesRan, 2,
+				processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
+				.size());
+	}
+
+	@Test
+	public void testPipelines3() throws IOException {
+		final List<Integer> processesRan = new ArrayList<Integer>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() throws InterruptedException {
+				processesRan.add(1);
+				stdout.println("ehlo");
+				Thread.sleep(500);
+				stdout.println("mydarling");
+				stdout.println("seeyou");
+			}
+		};
+
+		TesterProcess p2 = new TesterProcess(2, processesRan);
+
+		p1.pipe(p2).sh();
+
+		assertEquals("2 processes ran, not " + processesRan, 2,
+				processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
+				.size());
+	}
+
+	@Test
+	public void testPipelines4() throws IOException {
+		final List<Integer> processesRan = new ArrayList<Integer>();
+
+		Process p1 = new Process() {
+			@Override
+			public void runme() {
+				processesRan.add(1);
+				stdout.println("ehlo");
+				stdout.println("mydarling");
+				stdout.println("seeyou");
+			}
+		};
+
+		TesterProcess p2 = new TesterProcess(2, processesRan) {
+			@Override
+			public void runme() throws Exception {
+				Thread.sleep(500);
+				super.runme();
+			}
+		};
+
+		p1.pipe(p2).sh();
+
+		assertEquals("2 processes ran, not " + processesRan, 2,
+				processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
 				.size());
 	}
 

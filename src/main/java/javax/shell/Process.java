@@ -47,6 +47,8 @@ import java.util.regex.Pattern;
  */
 public abstract class Process extends Thread {
 
+	public final static int BUFFER_SIZE = 2048;
+
 	/**
 	 * This should be a possible value for stdout, doing nothing.
 	 */
@@ -184,8 +186,15 @@ public abstract class Process extends Thread {
 		}
 		if (stdout != null)
 			try {
+				stdout.flush();
 				stdout.close();
 			} catch (RuntimeException ne) {
+			}
+		if (stdin != null)
+			try {
+				stdin.close();
+			} catch (RuntimeException ne) {
+			} catch (IOException e) {
 			}
 	}
 
@@ -197,15 +206,15 @@ public abstract class Process extends Thread {
 
 	/**
 	 * Create a pipeline. The two programs are run in separated threads. Both
-	 * Programs did not run yet. Intendend use:
+	 * Programs did not run yet. Intended use:
 	 * 
-	 * p1.pipe(p2).pipe(p3).start()
+	 * p1.pipe(p2).pipe(p3).sh()
 	 * 
-	 * @return the second Program p2
+	 * @return the second Process p2
 	 * @throws IOException
 	 */
 	public Process pipe(Process p2) {
-		PipedInputStream pis = new PipedInputStream();
+		PipedInputStream pis = new PipedInputStream(BUFFER_SIZE);
 		PipedOutputStream pos;
 		try {
 			pos = new PipedOutputStream(pis);
@@ -226,7 +235,7 @@ public abstract class Process extends Thread {
 	 * 
 	 * p1.and(p2).start()
 	 * 
-	 * @return the second Program p2
+	 * @return the new Process
 	 */
 	public Process and(final Process p2) {
 
@@ -254,7 +263,7 @@ public abstract class Process extends Thread {
 	 * 
 	 * p1.or(p2).start()
 	 * 
-	 * @return the second Program p
+	 * @return the new Process
 	 */
 	public Process or(final Process p2) {
 

@@ -30,12 +30,13 @@ public class TesterProcess extends Process {
 		// DEBUG CODE
 		System.out.println("HERE TesterProcess " + id);
 
+		processesRan.add(id);
+
 		while (stdinReader.ready()) {
 			String line = stdinReader.readLine();
 			linesReceived.add(line);
 			stdout.println(line);
 		}
-		processesRan.add(id);
 	}
 
 	public List<String> getLinesReceived() {

@@ -1,23 +1,22 @@
 package javax.shell.test;
 
-import static javax.shell.Unix.*;
+import java.util.ArrayList;
+
 
 public class Example {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws Exception {
-		
-		String x = "fi*le*ff?le";
-		System.out.println(x.replace("*","\\*").replace("?","\\?"));
-		System.out.println(x.replaceAll("\\*","\\\\*").replaceAll("\\?","\\\\?"));
-		
-		
-		System.exit(-1);
-		ls("*").pipe(grep("carlo"));
-		
+	public static void main(String[] args) {
+		ArrayList<Integer> ran = new ArrayList<Integer>(); 
+		TesterProcess p1 = new TesterProcess(1, ran);
+		TesterProcess p2 = new TesterProcess(2, ran);
+			
+		p1.pipe(p2);
 
+		p1.start();
+		p2.start();
 	}
 
 }
