@@ -24,10 +24,8 @@ public class TestUnix {
 		// FIXME this only works if not packaged
 		URL resource = TestUnix.class.getResource("/dir1/file1.txt");
 		assertTrue("Resources file not found?!?", resource != null);
-		resourcesFolder = new File(resource.toURI()).getParentFile()
-				.getParentFile();
-		assertTrue("Resources folder " + resourcesFolder + " not found?!?",
-				resourcesFolder.exists());
+		resourcesFolder = new File(resource.toURI()).getParentFile().getParentFile();
+		assertTrue("Resources folder " + resourcesFolder + " not found?!?", resourcesFolder.exists());
 	}
 
 	@Test
@@ -37,17 +35,16 @@ public class TestUnix {
 		List<Integer> processesRan = new ArrayList<Integer>();
 		TesterProcess p3 = new TesterProcess(3, processesRan);
 
-		Process cd=cd("dir2");
-		Process ls=ls("file*");
-		Process and=cd.and(ls);
-		Process pp=and.pipe(p3);
+		Process cd = cd("dir2");
+		Process ls = ls("file*");
+		Process and = cd.and(ls);
+		Process pp = and.pipe(p3);
 		pp.sh();
-		//cd("dir2").and(ls("file*")).pipe(p3).sh();
+		// cd("dir2").and(ls("file*")).pipe(p3).sh();
 
-		assertEquals("There should be 1 file here", 1, p3.getLinesReceived()
-				.size());
+		assertEquals("There should be 1 file here", 1, p3.getLinesReceived().size());
 	}
-/*
+
 	@Test
 	public void testEcho() {
 		Shell.getInstance().setCurrentFolder(resourcesFolder.getAbsolutePath());
@@ -57,8 +54,7 @@ public class TestUnix {
 
 		echo("dir1/*").pipe(p2).sh();
 
-		assertEquals("Echo should emit 3 files on just one line", 1, p2
-				.getLinesReceived().size());
+		assertEquals("Echo should emit 3 files on just one line", 1, p2.getLinesReceived().size());
 	}
 
 	@Test
@@ -71,10 +67,8 @@ public class TestUnix {
 
 		cat("dir1/file*.txt").pipe(p2).pipe(grep("A")).pipe(p3).sh();
 
-		assertEquals("There are 5 lines in two files", 5, p2.getLinesReceived()
-				.size());
-		assertEquals("Only two lines contain 'A'", 2, p3.getLinesReceived()
-				.size());
+		assertEquals("There are 5 lines in two files", 5, p2.getLinesReceived().size());
+		assertEquals("Only two lines contain 'A'", 2, p3.getLinesReceived().size());
 	}
 
 	@Test
@@ -87,8 +81,6 @@ public class TestUnix {
 
 		ls("dir1").pipe(p2).sh();
 
-		assertEquals("There are 3 files inside folder 'dir1'", 3, p2
-				.getLinesReceived().size());
+		assertEquals("There are 3 files inside folder 'dir1'", 3, p2.getLinesReceived().size());
 	}
-*/
 }
