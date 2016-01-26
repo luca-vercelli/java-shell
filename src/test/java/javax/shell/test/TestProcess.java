@@ -23,10 +23,8 @@ public class TestProcess {
 		// FIXME this only works if not packaged
 		URL resource = TestUnix.class.getResource("/dir1/file1.txt");
 		assertTrue("Resources file not found?!?", resource != null);
-		resourcesFolder = new File(resource.toURI()).getParentFile()
-				.getParentFile();
-		assertTrue("Resources folder " + resourcesFolder + " not found?!?",
-				resourcesFolder.exists());
+		resourcesFolder = new File(resource.toURI()).getParentFile().getParentFile();
+		assertTrue("Resources folder " + resourcesFolder + " not found?!?", resourcesFolder.exists());
 	}
 
 	@Test
@@ -79,15 +77,7 @@ public class TestProcess {
 	public void testPipelines3() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
-		Process p1 = new Process() {
-			@Override
-			public void runme() {
-				processesRan.add(1);
-				stdout.println("ehlo");
-				stdout.println("mydarling");
-				stdout.println("seeyou");
-			}
-		};
+		Process p1 = new TesterProcessNoInput(1, processesRan);
 
 		TesterProcess p2 = new TesterProcess(2, processesRan);
 
@@ -95,36 +85,28 @@ public class TestProcess {
 
 		p1.pipe(p2).pipe(p3).sh();
 
-		assertEquals("3 processes ran, not " + processesRan, 3,
-				processesRan.size());
-		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
-				.size());
-		assertEquals("3 lines should be elaborated", 3, p3.getLinesReceived()
-				.size());
+		assertEquals("3 processes ran, not " + processesRan, 3, processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived().size());
+		assertEquals("3 lines should be elaborated", 3, p3.getLinesReceived().size());
 	}
 
+	/**
+	 * This test appear to fail on *some* jvm's ?!?
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void testPipelines2() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
-		Process p1 = new Process() {
-			@Override
-			public void runme() {
-				processesRan.add(1);
-				stdout.println("ehlo");
-				stdout.println("mydarling");
-				stdout.println("seeyou");
-			}
-		};
+		Process p1 = new TesterProcessNoInput(1, processesRan);
 
 		TesterProcess p2 = new TesterProcess(2, processesRan);
 
 		p1.pipe(p2).sh();
 
-		assertEquals("2 processes ran, not " + processesRan, 2,
-				processesRan.size());
-		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
-				.size());
+		assertEquals("2 processes ran, not " + processesRan, 2, processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived().size());
 	}
 
 	@Test
@@ -146,25 +128,15 @@ public class TestProcess {
 
 		p1.pipe(p2).sh();
 
-		assertEquals("2 processes ran, not " + processesRan, 2,
-				processesRan.size());
-		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
-				.size());
+		assertEquals("2 processes ran, not " + processesRan, 2, processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived().size());
 	}
 
 	@Test
 	public void testPipelinesWithReadDelay() throws IOException {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
-		Process p1 = new Process() {
-			@Override
-			public void runme() {
-				processesRan.add(1);
-				stdout.println("ehlo");
-				stdout.println("mydarling");
-				stdout.println("seeyou");
-			}
-		};
+		Process p1 = new TesterProcessNoInput(1, processesRan);
 
 		TesterProcess p2 = new TesterProcess(2, processesRan) {
 			@Override
@@ -176,33 +148,21 @@ public class TestProcess {
 
 		p1.pipe(p2).sh();
 
-		assertEquals("2 processes ran, not " + processesRan, 2,
-				processesRan.size());
-		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived()
-				.size());
+		assertEquals("2 processes ran, not " + processesRan, 2, processesRan.size());
+		assertEquals("3 lines should be elaborated", 3, p2.getLinesReceived().size());
 	}
 
 	@Test
 	public void testAnd() {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
-		Process p1 = new Process() {
-			@Override
-			public void runme() throws Exception {
-				processesRan.add(1);
-				stdout.println("ehlo");
-				stdout.println("mydarling");
-				stdout.println("seeyou");
-			}
-		};
+		TesterProcessNoInput p1 = new TesterProcessNoInput(1, processesRan);
 
-		TesterProcess p2 = new TesterProcess(2, processesRan);
+		TesterProcessNoInput p2 = new TesterProcessNoInput(2, processesRan);
 
 		p1.and(p2).sh();
 
 		assertEquals("Two processes ran", 2, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
-				.size());
 	}
 
 	@Test
@@ -222,31 +182,20 @@ public class TestProcess {
 		p1.and(p2).sh();
 
 		assertEquals("1 processes ran", 1, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
-				.size());
+		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived().size());
 	}
 
 	@Test
 	public void testOr() {
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
-		Process p1 = new Process() {
-			@Override
-			public void runme() throws Exception {
-				processesRan.add(1);
-				stdout.println("ehlo");
-				stdout.println("mydarling");
-				stdout.println("seeyou");
-			}
-		};
+		Process p1 = new TesterProcessNoInput(1, processesRan);
 
-		TesterProcess p2 = new TesterProcess(2, processesRan);
+		Process p2 = new TesterProcessNoInput(2, processesRan);
 
 		p1.or(p2).sh();
 
 		assertEquals("1 process ran", 1, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
-				.size());
 	}
 
 	@Test
@@ -261,13 +210,11 @@ public class TestProcess {
 			}
 		};
 
-		TesterProcess p2 = new TesterProcess(2, processesRan);
+		Process p2 = new TesterProcessNoInput(2, processesRan);
 
 		p1.or(p2).sh();
 
 		assertEquals("2 processes ran", 2, processesRan.size());
-		assertEquals("0 lines should be elaborated", 0, p2.getLinesReceived()
-				.size());
 	}
 
 	@Test
@@ -278,12 +225,12 @@ public class TestProcess {
 
 		final List<Integer> processesRan = new ArrayList<Integer>();
 
-		TesterProcess p1 = new TesterProcess(2, processesRan);
+		Process p1 = new TesterProcessNoInput(1, processesRan);
 
 		Process p2 = new Process() {
 			@Override
 			public void runme() throws Exception {
-				processesRan.add(1);
+				processesRan.add(2);
 				Thread.sleep(1000);
 			}
 		};

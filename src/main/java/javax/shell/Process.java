@@ -73,8 +73,7 @@ public abstract class Process extends Thread {
 	 * Standard input, supporting readLine(). This must <b>always</b> point to
 	 * stream stdin.
 	 */
-	protected BufferedReader stdinReader = new BufferedReader(
-			new InputStreamReader(System.in));
+	protected BufferedReader stdinReader = new BufferedReader(new InputStreamReader(System.in));
 
 	/**
 	 * Standard output
@@ -180,21 +179,14 @@ public abstract class Process extends Thread {
 		try {
 			runme();
 		} catch (Exception e) {
-			System.err.println("Unhandled exception in Thread "
-					+ this.getName());
+			System.err.println("Unhandled exception in Thread " + this.getName());
 			e.printStackTrace(System.err);
 		}
-		if (stdout != null)
+		if ((stdout != null) && (stdout != System.out))
 			try {
 				stdout.flush();
 				stdout.close();
 			} catch (RuntimeException ne) {
-			}
-		if (stdin != null)
-			try {
-				stdin.close();
-			} catch (RuntimeException ne) {
-			} catch (IOException e) {
 			}
 	}
 
@@ -342,8 +334,7 @@ public abstract class Process extends Thread {
 	/**
 	 * Create a list of FileInputStream, if any, or stdin.
 	 */
-	public List<InputStream> getInputStreams(List<String> files)
-			throws FileNotFoundException {
+	public List<InputStream> getInputStreams(List<String> files) throws FileNotFoundException {
 		List<InputStream> ret = new ArrayList<InputStream>();
 		if (files.isEmpty())
 			ret.add(stdin);
@@ -357,8 +348,7 @@ public abstract class Process extends Thread {
 	/**
 	 * Create a list of BufferedReader, if any, or stdin.
 	 */
-	public List<BufferedReader> getReaders(List<String> files)
-			throws FileNotFoundException {
+	public List<BufferedReader> getReaders(List<String> files) throws FileNotFoundException {
 		List<BufferedReader> ret = new ArrayList<BufferedReader>();
 		if (files.isEmpty())
 			ret.add(stdinReader);
@@ -372,8 +362,7 @@ public abstract class Process extends Thread {
 	/**
 	 * Create a list of FileOutputStream, if any, or stdout.
 	 */
-	public List<PrintStream> getOutputStreams(List<String> files, boolean append)
-			throws FileNotFoundException {
+	public List<PrintStream> getOutputStreams(List<String> files, boolean append) throws FileNotFoundException {
 		List<PrintStream> ret = new ArrayList<PrintStream>();
 		if (files.isEmpty())
 			ret.add(stdout);
@@ -404,8 +393,7 @@ public abstract class Process extends Thread {
 			return path.length() >= 2 && path.charAt(1) == ':';
 
 		} else {
-			throw new IllegalStateException(
-					"Unsupported operating system! Please report this.");
+			throw new IllegalStateException("Unsupported operating system! Please report this.");
 		}
 	}
 
@@ -437,8 +425,7 @@ public abstract class Process extends Thread {
 				return pieces;
 
 			} else {
-				throw new IllegalStateException(
-						"Unsupported operating system! Please report this.");
+				throw new IllegalStateException("Unsupported operating system! Please report this.");
 			}
 		}
 	}
@@ -457,8 +444,7 @@ public abstract class Process extends Thread {
 		return getCurrentFolder() + File.separator + path.trim();
 	}
 
-	private void expandRecursive(File root, Stack<String> pieces,
-			Set<String> ret) {
+	private void expandRecursive(File root, Stack<String> pieces, Set<String> ret) {
 
 		// DEBUG CODE
 		// System.out.println("DEBUG. entering expandRecursive(" + root + ", " +
@@ -481,8 +467,7 @@ public abstract class Process extends Thread {
 			}
 		} else {
 
-			final Pattern p = Pattern.compile(nextPiece.replace("*", ".*")
-					.replace("?", ".{1}"));
+			final Pattern p = Pattern.compile(nextPiece.replace("*", ".*").replace("?", ".{1}"));
 			String[] files = root.list(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String filename) {
@@ -529,8 +514,8 @@ public abstract class Process extends Thread {
 			String[] pieces = splitRoot(path);
 
 			// DEBUG CODE
-			System.err.println("SPLITROOT path=" + path + " pieces="
-					+ Arrays.asList(pieces) + " pwd=" + getCurrentFolder());
+			System.err.println(
+					"SPLITROOT path=" + path + " pieces=" + Arrays.asList(pieces) + " pwd=" + getCurrentFolder());
 
 			File root = new File(pieces[0]);
 

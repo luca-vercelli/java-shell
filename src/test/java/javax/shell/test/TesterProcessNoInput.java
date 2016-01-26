@@ -22,10 +22,10 @@ public class TesterProcessNoInput extends Process {
 
 	@Override
 	public void runme() {
-		processesRan.add(id);
 		stdout.println("ehlo");
 		stdout.println("mydarling");
 		stdout.println("seeyou");
+		processesRan.add(id);
 	}
 
 }

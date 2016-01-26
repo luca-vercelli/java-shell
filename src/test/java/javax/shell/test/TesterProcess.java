@@ -33,18 +33,13 @@ public class TesterProcess extends Process {
 	@Override
 	public void runme() throws Exception {
 
-		// DEBUG CODE
-		System.out.println("HERE TesterProcess " + id);
-
-		processesRan.add(id);
-
 		String line;
-		// while (stdinReader.ready()) {
-		// String line = stdinReader.readLine();
 		while ((line = stdinReader.readLine()) != null) {
 			linesReceived.add(line);
 			stdout.println(line);
 		}
+
+		processesRan.add(id);
 	}
 
 	public List<String> getLinesReceived() {
