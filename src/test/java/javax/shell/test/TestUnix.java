@@ -3,6 +3,7 @@ package javax.shell.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -82,5 +83,16 @@ public class TestUnix {
 
 		assertEquals("There are 3 files inside folder 'dir1'", 3, p2
 				.getLinesReceived().size());
+	}
+
+	@Test
+	public void testWget() throws IOException {
+		Shell.getInstance().setCurrentFolder(resourcesFolder.getAbsolutePath());
+		wget("http://www.arpa.net", "output.html").sh();
+
+		File f = new File(resourcesFolder.getAbsolutePath(), "output.html");
+
+		assertTrue("file not downloaded or not redirected", f.exists());
+		f.deleteOnExit();
 	}
 }

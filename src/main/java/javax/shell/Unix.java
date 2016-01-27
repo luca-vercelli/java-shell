@@ -509,6 +509,8 @@ public class Unix {
 	 * @throws IOException
 	 */
 	public static Process wget(final String address) {
+		// FIXME this is not the standard behaviour: wget alone does /not/ print
+		// to stdout
 		return new Process() {
 			@Override
 			public void runme() throws IOException {
