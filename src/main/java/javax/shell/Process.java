@@ -303,10 +303,34 @@ public abstract class Process extends Thread {
 					p2.runme();
 				}
 			}
+
+			@Override
+			public void setStdin(InputStream is) {
+				super.setStdin(is);
+				p1.stdin = is;
+				p1.stdinReader = this.stdinReader;
+				p2.stdin = is;
+				p2.stdinReader = this.stdinReader;
+			}
+
+			@Override
+			public void setStdout(OutputStream os) {
+				super.setStdout(os);
+				p1.stdout = this.stdout;
+				p2.stdout = this.stdout;
+			}
+
+			@Override
+			public void setStderr(OutputStream os) {
+				super.setStderr(os);
+				p1.stderr = this.stderr;
+				p2.stderr = this.stderr;
+			}
 		};
 
-		newP.stdin = p1.stdin;
-		newP.stdout = p2.stdout;
+		newP.setStdin(p1.stdin);
+		newP.setStdout(p2.stdout);
+		newP.setStderr(p2.stderr);
 		newP.prec = p1.prec;
 		return newP;
 	}
