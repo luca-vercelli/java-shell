@@ -39,7 +39,7 @@ limitations under the License.
   <contributors>
   </contributors>
   <build>
-    <testResources>
+    <!--testResources>
       <testResource>
         <filtering>true</filtering>
         <directory>src/test/resources</directory>
@@ -48,7 +48,7 @@ limitations under the License.
           <include>*.txt</include>
         </includes>
       </testResource>
-    </testResources>
+    </testResources-->
     <plugins>
        <plugin>
            <groupId>org.apache.maven.plugins</groupId>
@@ -72,5 +72,7 @@ limitations under the License.
   <properties>
     <maven.compile.source>1.7</maven.compile.source>
     <maven.compile.target>1.7</maven.compile.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties> 
 </project>
