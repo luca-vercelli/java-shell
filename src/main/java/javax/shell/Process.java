@@ -577,8 +577,8 @@ public abstract class Process extends Thread {
 			String[] pieces = splitRoot(path);
 
 			// DEBUG CODE
-			System.err.println("SPLITROOT path=" + path + " pieces="
-					+ Arrays.asList(pieces) + " pwd=" + getCurrentFolder());
+			//System.err.println("SPLITROOT path=" + path + " pieces="
+			//		+ Arrays.asList(pieces) + " pwd=" + getCurrentFolder());
 
 			File root = new File(pieces[0]);
 

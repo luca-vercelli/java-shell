@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
@@ -419,12 +418,11 @@ public class Unix {
 			@Override
 			public void runme() throws IOException {
 
-				List<InputStream> sources = this.getInputStreams(expArgs());
-				for (InputStream is : sources) {
-					byte[] buffer = new byte[1024];
-					int len;
-					while ((len = is.read(buffer)) != -1) {
-						stdout.write(buffer, 0, len);
+				List<BufferedReader> sources = this.getReaders(expArgs());
+				for (BufferedReader r : sources) {
+					String line;
+					while ((line = r.readLine()) != null) {
+						stdout.println(line);
 					}
 				}
 			}
@@ -441,9 +439,9 @@ public class Unix {
 			public void runme() throws IOException {
 
 				List<BufferedReader> sources = this.getReaders(expArgs());
-				for (BufferedReader is : sources) {
-					while (is.ready()) {
-						String line = is.readLine();
+				for (BufferedReader r : sources) {
+					String line;
+					while ((line = r.readLine()) != null) {
 						if (line != null && line.contains(text))
 							stdout.println(line);
 					}
@@ -462,9 +460,9 @@ public class Unix {
 			public void runme() throws IOException {
 
 				List<BufferedReader> sources = this.getReaders(expArgs());
-				for (BufferedReader is : sources) {
-					while (is.ready()) {
-						String line = is.readLine();
+				for (BufferedReader r : sources) {
+					String line;
+					while ((line = r.readLine()) != null) {
 						if (line != null && !line.contains(text))
 							stdout.println(line);
 					}

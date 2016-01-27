@@ -20,7 +20,6 @@ public class TestProcess {
 
 	@BeforeClass
 	public static void setup() throws URISyntaxException {
-		// FIXME this only works if not packaged
 		URL resource = TestUnix.class.getResource("/dir1/file1.txt");
 		assertTrue("Resources file not found?!?", resource != null);
 		resourcesFolder = new File(resource.toURI()).getParentFile().getParentFile();

@@ -25,7 +25,7 @@ public class Shell {
 		}
 
 		// DEBUG CODE
-		System.out.println("Returning Shell: " + sh);
+		// System.out.println("Returning Shell: " + sh);
 
 		return sh;
 	}
