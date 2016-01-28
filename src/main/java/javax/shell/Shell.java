@@ -190,7 +190,9 @@ public class Shell {
 	}
 
 	/**
-	 * Shell-expansion of arguments
+	 * Shell-expansion of arguments. Every argument is expanded according to
+	 * current folder. If no expansion is available, the argument is returned
+	 * as-is.
 	 */
 	public List<String> expand(List<String> paths) {
 		if (paths == null)
@@ -226,7 +228,9 @@ public class Shell {
 				piecesStack.push(pieces[i]);
 
 			Set<String> singlePathExpansion = new HashSet<String>();
+
 			expandRecursive(root, piecesStack, singlePathExpansion);
+
 			if (singlePathExpansion.isEmpty()) {
 				ret.add(path);
 			} else {
