@@ -425,10 +425,92 @@ public class Unix {
 	}
 
 	/**
-	 * Create symbolic link.
+	 * Create hard link. If no destination is given, current folder will be
+	 * used. Destination may be an existing folder, or a non-existing regular
+	 * file name.
+	 * 
+	 * Not all operating systems may support links, and not for all kind of
+	 * files.
+	 * 
+	 * @param src
+	 *            Exactly one source (i.e. target) file, and zero or one
+	 *            destinations.
 	 */
-	public static Process ln_s(String src, String dest) {
-		throw new IllegalStateException("Not implemented");
+	public static Process ln(String... srcAndDest) {
+		return new Process(srcAndDest) {
+			@Override
+			public void runme() throws IOException {
+
+				if (expArgs().isEmpty() || expArgs().size() > 2)
+					throw new IllegalArgumentException(
+							"1 or 2 arguments expected");
+
+				File target = new File(getAbsolutePath(expArgs().get(0)));
+				File link = new File(
+						(expArgs().size() == 1) ? getAbsolutePath(".")
+								: getAbsolutePath(expArgs().get(1)));
+
+				if (!target.exists())
+					throw new IllegalArgumentException(
+							"Target file does not exist: " + target.getPath());
+
+				if (link.exists()) {
+					if (link.isDirectory())
+						link = new File(link, target.getName());
+					else
+						throw new IllegalArgumentException(
+								"Link file already exist: " + link.getPath());
+				}
+
+				Files.createLink(Paths.get(link.getPath()),
+						Paths.get(target.getPath()));
+			}
+		};
+	}
+
+	/**
+	 * Create symbolic link. If no destination is given, current folder will be
+	 * used. Destination may be an existing folder, or a non-existing regular
+	 * file name.
+	 * 
+	 * Not all operating systems may support links, and not for all kind of
+	 * files.
+	 * 
+	 * @param src
+	 *            Exactly one source (i.e. target) file, and zero or one
+	 *            destinations.
+	 */
+	public static Process ln_s(String... srcAndDest) {
+		return new Process(srcAndDest) {
+
+			@Override
+			public void runme() throws IOException {
+
+				if (expArgs().isEmpty() || expArgs().size() > 2)
+					throw new IllegalArgumentException(
+							"1 or 2 arguments expected");
+
+				File target = new File(getAbsolutePath(expArgs().get(0)));
+				File link = new File(
+						(expArgs().size() == 1) ? getAbsolutePath(".")
+								: getAbsolutePath(expArgs().get(1)));
+
+				if (!target.exists())
+					throw new IllegalArgumentException(
+							"Target file does not exist: " + target.getPath());
+
+				if (link.exists()) {
+					if (link.isDirectory())
+						link = new File(link, target.getName());
+					else
+						throw new IllegalArgumentException(
+								"Link file already exist: " + link.getPath());
+				}
+
+				Files.createSymbolicLink(Paths.get(link.getPath()),
+						Paths.get(target.getPath()));
+			}
+		};
 	}
 
 	/**
