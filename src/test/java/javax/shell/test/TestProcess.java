@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.shell.Process;
+import javax.shell.Shell;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,45 +30,40 @@ public class TestProcess {
 	@Test
 	public void testExpansion() {
 
-		Process p = new Process() {
+		Shell sh = Shell.getInstance();
 
-			@Override
-			public void runme() throws Exception {
-			}
-		};
-
-		p.setCurrentFolder(resourcesFolder.getAbsolutePath());
+		sh.setCurrentFolder(resourcesFolder.getAbsolutePath());
 
 		List<String> args, exp;
 
 		args = new ArrayList<String>();
 		args.add("./dir1/file*");
-		exp = p.expand(args);
+		exp = sh.expand(args);
 		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("dir1/file*");
-		exp = p.expand(args);
+		exp = sh.expand(args);
 		assertEquals("There are 3 files", 3, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("dir1/file?.txt");
-		exp = p.expand(args);
+		exp = sh.expand(args);
 		assertEquals("There are 2 files .txt here", 2, exp.size());
 
 		args = new ArrayList<String>();
 		args.add(resourcesFolder.getAbsolutePath() + "/dir1/file?.txt");
-		exp = p.expand(args);
+		exp = sh.expand(args);
 		assertEquals("There are 2 files .txt here", 2, exp.size());
 
 		args = new ArrayList<String>();
 		args.add("/file?.txt");
-		exp = p.expand(args);
+		exp = sh.expand(args);
 		assertTrue("No file should be there", exp.isEmpty());
 
 		args = new ArrayList<String>();
 		args.add("*/file*.txt");
-		exp = p.expand(args);
+		exp = sh.expand(args);
 		assertEquals("There are 2+1=3 files .txt", 3, exp.size());
 
 	}

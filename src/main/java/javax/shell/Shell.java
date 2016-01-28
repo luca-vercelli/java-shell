@@ -225,7 +225,13 @@ public class Shell {
 			for (int i = pieces.length - 1; i > 0; --i)
 				piecesStack.push(pieces[i]);
 
-			expandRecursive(root, piecesStack, ret);
+			Set<String> singlePathExpansion = new HashSet<String>();
+			expandRecursive(root, piecesStack, singlePathExpansion);
+			if (singlePathExpansion.isEmpty()) {
+				ret.add(path);
+			} else {
+				ret.addAll(singlePathExpansion);
+			}
 		}
 		return new ArrayList<String>(ret);
 	}
