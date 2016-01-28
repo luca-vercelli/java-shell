@@ -24,6 +24,9 @@ public class Shell {
 
 	private static Map<String, Shell> instances = new HashMap<String, Shell>();
 
+	/**
+	 * Return the correct Shell instance for current Thread.
+	 */
 	public static Shell getInstance() {
 		String threadName = Thread.currentThread().getName();
 		Shell sh = instances.get(threadName);
@@ -76,15 +79,27 @@ public class Shell {
 	private Map<String, String> env = new HashMap<String, String>();
 
 	/**
-	 * Return true if path is absolute (i.e. /some/p*ath/ or C:\so?me\path ).
+	 * User home directory
 	 */
-	protected static boolean isAbsolute(String path) {
+	public String getUserHome() {
+		return System.getProperty("user.home");
+	}
+
+	/**
+	 * Return true if path is absolute (i.e. /some/p*ath/ or C:\so?me\path ).
+	 * Return true also in case of paths beginning with '~' (user home
+	 * directory).
+	 */
+	public static boolean isAbsolute(String path) {
 
 		if (path == null)
 			throw new IllegalArgumentException("null path given");
 		path = path.trim();
 		if (path.equals(""))
 			throw new IllegalArgumentException("empty path given");
+
+		if (path.charAt(0) == '~')
+			return true;
 
 		if (File.separator.equals("/")) {
 			// *NIX
@@ -103,8 +118,13 @@ public class Shell {
 	 * Split the path in pieces according to File.separator. The first piece is
 	 * the "root": it is the path's root ( "/" or "C:\" ) if the given path is
 	 * absolute, or current folder if it is relative.
+	 * 
+	 * If path starts with "~", this will be expanded into user home.
 	 */
 	protected String[] splitRoot(String path) {
+
+		if (path.charAt(0) == '~')
+			path = getUserHome() + path.substring(1);
 
 		String[] pieces = path.split(File.separator);
 
@@ -138,10 +158,17 @@ public class Shell {
 	 */
 	protected String getAbsolutePath(String path) {
 
+		if (path == null)
+			throw new IllegalArgumentException("null path given");
+		path = path.trim();
+		if (path.equals(""))
+			throw new IllegalArgumentException("empty path given");
+
+		if (path.charAt(0) == '~')
+			return getUserHome() + path.substring(1);
+
 		if (isAbsolute(path))
 			return path;
-
-		// here, the path is relative, and it is not null nor empty.
 
 		return getCurrentFolder() + File.separator + path.trim();
 	}
@@ -202,7 +229,7 @@ public class Shell {
 		// System.out.println("expand:" + paths);
 
 		Set<String> ret = new HashSet<String>();
-		for (String path : paths) {
+		for (final String path : paths) {
 
 			if (path == null)
 				continue; // should not happen ... but...
