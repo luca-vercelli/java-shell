@@ -16,12 +16,17 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * It is useful to have all *NIX commands inside this class (it's easier to
- * import). Import using:
+ * This class contains only static methods that return a {@see Process}. All
+ * these methods are useful for <i>scripting</i>, i.e. writing simple programs
+ * with a few lines of code. The names of these methods recall common *NIX
+ * commands.
  * 
- * import static javax.shell.Unix.*;
+ * It is useful to have all these commands inside this class, because it's
+ * easier to import. Import using:
  * 
- * All these routines return a {@see Process}. They should follow common
+ * <code>import static javax.shell.Unix.*;</code>
+ * 
+ * All these static methods return a {@see Process}. They should follow common
  * command-line standards:
  * <ul>
  * <li>Support for stdin and stdout
@@ -35,7 +40,7 @@ import java.util.Stack;
 public class Unix {
 
 	/**
-	 * *NIX shell command <code>pwd</code> (i.e. print working directory).
+	 * Print working directory.
 	 */
 	public static Process pwd() {
 		return new Process() {
@@ -47,7 +52,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX shell command <code>cd</code> (i.e. change directory).
+	 * Change directory.
 	 */
 	public static Process cd(String folder) {
 		return new Process(folder) {
@@ -63,8 +68,7 @@ public class Unix {
 	private static Stack<String> historyFolders = new Stack<String>();
 
 	/**
-	 * *NIX shell command <code>pushd</code> (i.e. change directory saving
-	 * current one).
+	 * Change directory, pushing the current one in an internal stack.
 	 */
 	public static Process pushd(final String folder) {
 		return new Process() {
@@ -77,9 +81,11 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX shell command <code>pushd</code> (i.e. change directory saving
-	 * current one). An {@see EmptyStackException} will be thrown if no
-	 * <code>pushd</code> were called before.
+	 * Change directory, popping it from an internal stack (saved by
+	 * <code>pushd</code>).
+	 * 
+	 * @throws EmptyStackException
+	 *             if no <code>pushd</code> were called before.
 	 */
 	public static Process popd() {
 		return new Process() {
@@ -91,7 +97,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX shell command <code>echo</code> (i.e. print to stdout).
+	 * Print to stdout. All arguments will be concatenated with a blank space.
 	 */
 	public static Process echo(String... args) {
 		return new Process(args) {
@@ -105,8 +111,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>ls</code> (i.e. list directory). Do not print hidden
-	 * files.
+	 * List directory. Do not print hidden files.
 	 */
 	public static Process ls(String... args) {
 		return new Process(args) {
@@ -136,7 +141,14 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>cp</code> (i.e. copy files).
+	 * Copy files. Many regular (non-directory) files may be copied into a
+	 * single target directory. Destination must be a directory, and must not
+	 * exist.
+	 * 
+	 * We allow one only exception to the general rule: if exactly one source
+	 * file is given, and the destination target does not exist, and the
+	 * <i>parent</i> of the target is an existing directory, than we guess that
+	 * the user means to create a new regular file with the given name.
 	 * 
 	 * @param sourcesAndDest
 	 *            At least one source file or folder, and exactly one
@@ -190,8 +202,14 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>cp -r</code> (i.e. copy files and folders
-	 * recursively).
+	 * Copy files and folders recursively. Many regular files and/or directories
+	 * may be copied into a single target directory. Destination must be a
+	 * directory, and must not exist.
+	 * 
+	 * We allow one only exception to the general rule: if exactly one source
+	 * file/directory is given, and the destination target does not exist, and
+	 * the <i>parent</i> of the target is an existing directory, than we guess
+	 * that the user means to create a new regular file with the given name.
 	 * 
 	 * @param sourcesAndDest
 	 *            At least one source file or folder, and exactly one
@@ -254,7 +272,14 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>mv</code> (i.e. move files).
+	 * Move files and folders to a new location. Many regular files and/or
+	 * directories may be moved into a single target directory. Destination must
+	 * be a directory, and must not exist.
+	 * 
+	 * We allow one only exception to the general rule: if exactly one source
+	 * file/directory is given, and the destination target does not exist, and
+	 * the <i>parent</i> of the target is an existing directory, than we guess
+	 * that the user means to rename the source.
 	 * 
 	 * @param sourcesAndDest
 	 *            At least one source file or folder, and exactly one
@@ -300,8 +325,8 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>rm -f</code> (i.e. remove files). No error is given if
-	 * file does not exists. An error is given if file is a directory.
+	 * Remove regular (non/directory) files. No error is given if file does not
+	 * exists. An error is given if file is a directory.
 	 */
 	public static Process rm(String... src) {
 		return new Process(src) {
@@ -321,9 +346,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>rm -rf</code> (i.e. remove files and folders
-	 * recursively). No error is given ithrow new
-	 * IllegalArgumentException(f.getPath() + " is a directory");f file does not
+	 * Remove recursively files and folders. No error is given if file does not
 	 * exists.
 	 */
 	public static Process rm_r(String... src) {
@@ -350,7 +373,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>mkdir</code> (i.e. make directory).
+	 * Make directory.
 	 */
 	public static Process mkdir(String... folders) {
 		return new Process(folders) {
@@ -363,8 +386,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>mkdir -p</code> (i.e. make directory including all
-	 * upper levels).
+	 * Make directory including all upper levels.
 	 */
 	public static Process mkdir_p(String... folders) {
 		return new Process(folders) {
@@ -377,9 +399,8 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>rmdir</code> (i.e. remove empty directories). No error
-	 * is given if folder does not exists. An error is given if file is not a
-	 * directory, or the directory is not empty.h hidden //
+	 * Remove empty directories. No error is given if folder does not exists. An
+	 * error is given if file is not a directory, or the directory is not empty.
 	 */
 	public static Process rmdir(String... folders) {
 		return new Process(folders) {
@@ -404,14 +425,14 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>ln -s</code> (i.e. create symbolic link).
+	 * Create symbolic link.
 	 */
 	public static Process ln_s(String src, String dest) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
-	 * *NIX program <code>cat</code> (i.e. print content of files).
+	 * Concatenate files and print to standard output.
 	 */
 	public static Process cat(String... src) {
 		return new Process(src) {
@@ -430,8 +451,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>grep</code> (i.e. search for text lines matching some
-	 * pattern).
+	 * Print text lines matching a pattern.
 	 */
 	public static Process grep(final String text, String... src) {
 		return new Process(src) {
@@ -451,8 +471,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>grep -v</code> (i.e. search for text lines <i>not</i>
-	 * matching some pattern).
+	 * Print text lines <i>not</i> matching a pattern.
 	 */
 	public static Process grep_v(final String text, String... src) {
 		return new Process(src) {
@@ -472,7 +491,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>true</code> (i.e. always succeed).
+	 * Always succeed.
 	 */
 	public static Process true_() {
 		return new Process() {
@@ -484,7 +503,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>false</code> (i.e. fail always).
+	 * Fail always.
 	 */
 	public static Process false_() {
 		return new Process() {
@@ -496,15 +515,14 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>find</code> (i.e. search for files).
+	 * Search for files in a directory hierarchy.
 	 */
 	public static Process find(String options, String folder) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
-	 * *NIX program <code>wget</code> (i.e. download files from internet).
-	 * Output to stdout.
+	 * Download files from network. Output to stdout.
 	 * 
 	 * @throws IOException
 	 */
@@ -534,7 +552,7 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>wget</code> (i.e. download files from internet).
+	 * Download files from network and save output file with given name.
 	 * 
 	 * @throws IOException
 	 */
@@ -544,28 +562,28 @@ public class Unix {
 	}
 
 	/**
-	 * *NIX program <code>zip</code> (i.e. add/update files to archive).
+	 * Add/update files to ZIP archive. TODO.
 	 */
 	public static Process zip(String args) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
-	 * *NIX program <code>unzip</code> (i.e. extract files from archive).
+	 * Extract files from ZIP archive. TODO.
 	 */
 	public static Process unzip(String args) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
-	 * *NIX program <code>tar -c</code> (i.e. add/update files to archive).
+	 * Add/update files to TAR/TGZ archive. TODO.
 	 */
 	public static Process tar_c(String args) {
 		throw new IllegalStateException("Not implemented");
 	}
 
 	/**
-	 * *NIX program <code>tar -x</code> (i.e. extract files from archive).
+	 * Extract files from TAR/TGZ archive. TODO.
 	 */
 	public static Process tar_x(String args) {
 		throw new IllegalStateException("Not implemented");
