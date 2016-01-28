@@ -59,7 +59,8 @@ public class TestProcess {
 		args = new ArrayList<String>();
 		args.add("/file?.txt");
 		exp = sh.expand(args);
-		assertTrue("No file should be there", exp.isEmpty());
+		assertTrue("No file should be there", exp.size() == 1);
+		assertTrue("No file should be there", exp.get(0).equals("/file?.txt"));
 
 		args = new ArrayList<String>();
 		args.add("*/file*.txt");
