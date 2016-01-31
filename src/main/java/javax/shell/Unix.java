@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
+import java.util.Queue;
+import java.util.PriorityQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * This class contains only static methods that return a {@see Process}. All
@@ -538,6 +541,86 @@ public class Unix {
 					while ((line = r.readLine()) != null) {
 						if (line != null && !line.contains(text))
 							stdout.println(line);
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * Print first <code>n</code> lines of all given texts.
+	 */
+	public static Process head(final int n, String... src) {
+		return new Process(src) {
+			@Override
+			public void runme() throws IOException {
+
+				List<BufferedReader> sources = this.getReaders(expArgs());
+				for (BufferedReader r : sources) {
+					String line;
+					for (int i = 0; i < n && (line = r.readLine()) != null; ++i) {
+						stdout.println(line);
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * Print last <code>n</code> lines of all given texts.
+	 * Please notice that, even in a pipeline, this Process may emit output only after all input arrived.
+	 */
+	public static Process tail(final int n, String... src) {
+		return new Process(src) {
+			@Override
+			public void runme() throws IOException {
+
+				List<BufferedReader> sources = this.getReaders(expArgs());
+				Queue<String> lastLines = new ArrayBlockingQueue<String>(n);
+				for (BufferedReader r : sources) {
+					String line;
+					lastLines.clear();
+					//load first n lines
+					for (int i = 0; i < n && (line = r.readLine()) != null; ++i) {
+						lastLines.add(line);
+					}
+					//load next lines and discard previous ones
+					while ((line = r.readLine()) != null) {
+						lastLines.remove();
+						lastLines.add(line);
+					}
+					//at last, emit all remaining lines
+					for (int i = 0; i < n; ++i) {
+						stdout.println(lastLines.poll());
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * Print last <code>n</code> lines of all given texts.
+	 * Please notice that, even in a pipeline, this Process may emit output only after all input arrived.
+	 */
+	public static Process sort(String... src) {
+		return new Process(src) {
+			@Override
+			public void runme() throws IOException {
+
+				List<BufferedReader> sources = this.getReaders(expArgs());
+				Queue<String> orderedLines = new PriorityQueue<String>();
+				for (BufferedReader r : sources) {
+					String line;
+					orderedLines.clear();
+					//load all lines
+					int n = 0;
+					while ((line = r.readLine()) != null) {
+						orderedLines.add(line);
+						++n;
+					}
+					//at last, emit all lines
+					for (int i = 0; i < n; ++i) {
+						stdout.println(orderedLines.poll());
 					}
 				}
 			}
